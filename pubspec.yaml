@@ -24,6 +24,7 @@ dependencies:
   google_fonts: ^4.0.4
   image_picker: ^1.0.4
   firebase_storage: ^11.6.0
+  intl: ^0.18.1
 
 flutter_icons:
   android: true

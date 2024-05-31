@@ -1,3 +1,4 @@
+import 'club_fixtures.dart';
 import 'package:get/get.dart';
 import 'all_teams_screen.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,8 @@ class CreateNewClub extends StatelessWidget {
                           Get.to(() => TeamsDataScreen());
                           break;
                         case 3:
-                          // Navigate to create school screen
+                          // Navigate to create fixtures screen
+                          Get.to(() => FixturesScreen());
                           break;
                         // case 4:
                         //   // Navigate to create other screen
@@ -142,11 +144,11 @@ class CreateNewClub extends StatelessWidget {
       case 2:
         return 'All Teams';
       case 3:
-        return 'Other';
+        return 'Club Fixtures';
       // case 4:
       //   return 'Other';
       default:
-        return '';
+        return 'Other';
     }
   }
 }

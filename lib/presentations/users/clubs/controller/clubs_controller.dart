@@ -72,6 +72,12 @@ class ClubController extends GetxController {
   String? clubType;
   String? logoUrl;
 
+  //final List<ClubTeamsData> teams = <ClubTeamsData>[].obs;
+  final TextEditingController matchDateController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final RxString selectedTeam1 = ''.obs;
+  final RxString selectedTeam2 = ''.obs;
+
   // Reactive list to store the clubsTeamsData fetched
   RxList<ClubTeamsData> clubsTeamsData = <ClubTeamsData>[].obs;
   // Reactive list to store the fixtures fetched
@@ -195,13 +201,13 @@ class ClubController extends GetxController {
       });
 
       // Show success snackbar
-      Get.snackbar(
-        'Success',
-        'Clubs fetched successfully',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      // Get.snackbar(
+      //   'Success',
+      //   'Clubs fetched successfully',
+      //   snackPosition: SnackPosition.TOP,
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      // );
     } catch (e) {
       print('Error fetching clubs: $e');
       // Show error snackbar
@@ -235,13 +241,13 @@ class ClubController extends GetxController {
       print('fixtures: ${fixtures.length}');
 
       // Show success snackbar
-      Get.snackbar(
-        'Success',
-        'Fixtures fetched successfully',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      // Get.snackbar(
+      //   'Success',
+      //   'Fixtures fetched successfully',
+      //   snackPosition: SnackPosition.TOP,
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      // );
     } catch (e) {
       print('Error fetching fixtures: $e');
       // Show error snackbar
@@ -307,6 +313,8 @@ class ClubController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
+
+      await fetchAllFixtures();
     } catch (e) {
       print('Error creating fixture: $e');
       // Show error snackbar

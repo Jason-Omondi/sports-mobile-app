@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../presentations/users/clubs/new_club.dart';
+import '../../presentations/users/clubs/club_categories.dart';
 import '../../presentations/login_screen/controller/login_controller.dart';
 
 class CustomDrawer extends StatelessWidget {

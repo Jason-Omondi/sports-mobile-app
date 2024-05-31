@@ -4,10 +4,12 @@ import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../utils/widgets/user_drawer.dart';
 import '../../../data/models/articles_model.dart';
+import 'package:sportsapp/presentations/users/clubs/controller/clubs_controller.dart';
 import 'package:sportsapp/presentations/login_screen/controller/login_controller.dart';
 
 class UserDashboardScreen extends StatelessWidget {
   final LoginController loginController;
+  final ClubController clubController = Get.put(ClubController());
 
   UserDashboardScreen({required this.loginController, Key? key})
       : super(key: key);
@@ -26,7 +28,7 @@ class UserDashboardScreen extends StatelessWidget {
     // Add more dummy articles as needed
   ];
 
-  List<String> _clubs = ['Football', 'Tennis', 'Basketball'];
+  //final List<String> _clubs = clubController.sportsTypes;
 
   // Inside UserDashboardScreen build method
   Widget userInformationCard() {
@@ -76,7 +78,7 @@ class UserDashboardScreen extends StatelessWidget {
 // Inside UserDashboardScreen build method
   Widget selectCategorySection() {
     // Logic to fetch upcoming games for each club
-    List<String> clubs = _clubs;
+    List<String> clubs = clubController.sportsTypes;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
       child: Column(
