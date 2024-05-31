@@ -11,6 +11,7 @@ import '../../../login_screen/controller/login_controller.dart';
 
 class ClubController extends GetxController {
   final FocusNode nameFocusNode = FocusNode();
+  final FocusNode locationFocusNode = FocusNode();
   final FocusNode postalCodeFocusNode = FocusNode();
   final FocusNode contactEmailFocusNode = FocusNode();
   final LoginController loginController = Get.find();

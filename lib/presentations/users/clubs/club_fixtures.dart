@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/fixtures_model.dart';
 import '../../../data/models/club_teams_model.dart';
 
-
 class FixturesScreen extends StatelessWidget {
   final ClubController clubController = Get.find();
 
@@ -108,7 +107,21 @@ class FixturesScreen extends StatelessWidget {
             onChanged: (value) {
               clubController.selectedTeam1.value = value!;
             },
-            decoration: InputDecoration(labelText: 'Select Team 1'),
+            decoration: InputDecoration(
+              labelText: 'Select Team 1',
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
           SizedBox(height: 10),
           DropdownButtonFormField<String>(
@@ -124,12 +137,24 @@ class FixturesScreen extends StatelessWidget {
             onChanged: (value) {
               clubController.selectedTeam2.value = value!;
             },
-            decoration: InputDecoration(labelText: 'Select Team 2'),
+            decoration: InputDecoration(
+              labelText: 'Select Team 2',
+              border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.blueAccent),
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
           SizedBox(height: 10),
-          TextFormField(
-            controller: clubController.matchDateController,
-            decoration: InputDecoration(labelText: 'Match Date'),
+          InkWell(
             onTap: () async {
               final DateTime? pickedDate = await showDatePicker(
                 context: Get.context!,
@@ -139,20 +164,94 @@ class FixturesScreen extends StatelessWidget {
               );
               if (pickedDate != null) {
                 clubController.matchDateController.text =
-                    pickedDate.toString(); // Update the controller value
+                    DateFormat('dd/MM/yyyy')
+                        .format(pickedDate); // Update the controller value
               }
             },
+            child: Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.date_range),
+                  SizedBox(width: 10),
+                  Text(
+                    'Match Date',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  Spacer(),
+                  Text(
+                    clubController.matchDateController.text,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           SizedBox(height: 10),
-          TextFormField(
-            controller: clubController.locationController,
-            decoration: InputDecoration(labelText: 'Location'),
+          Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 1,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: clubController.locationController,
+              focusNode: clubController.locationFocusNode,
+              decoration: InputDecoration(
+                labelText: 'Location',
+                border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: clubController.locationFocusNode.hasFocus
+                        ? Colors.blue
+                        : Colors.grey.shade400,
+                    width: 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.blue,
+                    width: 2.0,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
           ),
+          SizedBox(height: 10),
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               _submitFixtureForm();
             },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.teal),
+              foregroundColor: MaterialStateProperty.all(Colors.white),
+              shape: MaterialStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              padding: MaterialStateProperty.all(
+                EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+              ),
+            ),
             child: Text('Submit'),
           ),
         ],
@@ -201,7 +300,11 @@ class FixturesScreen extends StatelessWidget {
       () => clubController.isLoading.value
           ? Center(child: CircularProgressIndicator())
           : clubController.fixtures.isEmpty
-              ? Center(child: Text('No fixtures available', style: GoogleFonts.nunito(),))
+              ? Center(
+                  child: Text(
+                  'No fixtures available',
+                  style: GoogleFonts.nunito(),
+                ))
               : ListView.builder(
                   itemCount: clubController.fixtures.length,
                   itemBuilder: (context, index) {
@@ -212,90 +315,88 @@ class FixturesScreen extends StatelessWidget {
     );
   }
 
-Widget _buildFixtureCard(Fixture fixture) {
-  final team1 = clubController.clubsTeamsData.firstWhere(
-    (team) => team.id == fixture.team1Id,
-    orElse: () => ClubTeamsData(logoUrl: ''),
-  );
-  final team2 = clubController.clubsTeamsData.firstWhere(
-    (team) => team.id == fixture.team2Id,
-    orElse: () => ClubTeamsData(logoUrl: ''),
-  );
+  Widget _buildFixtureCard(Fixture fixture) {
+    final team1 = clubController.clubsTeamsData.firstWhere(
+      (team) => team.id == fixture.team1Id,
+      orElse: () => ClubTeamsData(logoUrl: ''),
+    );
+    final team2 = clubController.clubsTeamsData.firstWhere(
+      (team) => team.id == fixture.team2Id,
+      orElse: () => ClubTeamsData(logoUrl: ''),
+    );
 
-  return Card(
-    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-    elevation: 4,
-    child: Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  team1.logoUrl ?? '',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.error),
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      elevation: 4,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    team1.logoUrl ?? '',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.error),
+                  ),
                 ),
-              ),
-              Text(
-                'VS',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                Text(
+                  'VS',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  team2.logoUrl ?? '',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.error),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(
+                    team2.logoUrl ?? '',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.error),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Sport: ${fixture.sport}',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Match Date: ${DateFormat.yMMMd().format(fixture.matchDateTime)}',
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Location: ${fixture.location}',
-          ),
-          SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  _showDeleteConfirmationDialog(fixture);
-                },
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Sport: ${fixture.sport}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Match Date: ${DateFormat.yMMMd().format(fixture.matchDateTime)}',
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Location: ${fixture.location}',
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _showDeleteConfirmationDialog(fixture);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
-
+    );
+  }
 
   // Widget _buildFixtureCard(Fixture fixture) {
   //   final team1 = clubController.clubsTeamsData.firstWhere(
