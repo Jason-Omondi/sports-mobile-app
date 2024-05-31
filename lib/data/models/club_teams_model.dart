@@ -1,23 +1,23 @@
 class ClubTeamsData {
-  String id;
-  String name;
-  String logoUrl;
-  bool isJuniorTeam;
-  String sport;
-  String county;
-  String postalZip;
-  String contactEmail;
+  String? id;
+  String? name;
+  String? logoUrl;
+  bool? isJuniorTeam;
+  String? sport;
+  String? county;
+  String? postalZip;
+  String? contactEmail;
   //String clubType;
 
   ClubTeamsData({
-    required this.id,
-    required this.name,
-    required this.logoUrl,
-    required this.isJuniorTeam,
-    required this.sport,
-    required this.county,
-    required this.postalZip,
-    required this.contactEmail,
+    this.id,
+    this.name,
+    this.logoUrl,
+    this.isJuniorTeam,
+    this.sport,
+    this.county,
+    this.postalZip,
+    this.contactEmail,
     //required this.clubType,
   });
 

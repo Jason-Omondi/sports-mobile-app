@@ -85,7 +85,7 @@ class TeamsDataScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        club.name,
+                        club.name!,
                         style: GoogleFonts.nunito(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -108,7 +108,7 @@ class TeamsDataScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text(
-              'Junior Team: ${club.isJuniorTeam ? 'Yes' : 'No'}',
+              'Junior Team: ${club.isJuniorTeam! ? 'Yes' : 'No'}',
               style: GoogleFonts.nunito(),
             ),
             SizedBox(height: 4),
