@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:get/get.dart';
+import '../all_teams_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/models/club_teams_model.dart';
@@ -149,17 +150,15 @@ class ClubController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
           duration: Duration(seconds: 5));
-      Get.back();
+      Get.to(() => TeamsDataScreen());
     } catch (e) {
       print('Error creating new club: $e');
       // Show error snackbar
-      Get.snackbar(
-        'Error',
-        'Failed to create club',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      Get.snackbar('Error', 'Something went wrong!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
     } finally {
       isLoading(false);
     }
