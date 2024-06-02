@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../utils/widgets/user_drawer.dart';
+import '../../../data/models/fixtures_model.dart';
 import '../../../data/models/articles_model.dart';
+import '../../../data/models/club_teams_model.dart';
 import 'package:sportsapp/presentations/users/clubs/controller/clubs_controller.dart';
 import 'package:sportsapp/presentations/login_screen/controller/login_controller.dart';
 
@@ -27,8 +29,6 @@ class UserDashboardScreen extends StatelessWidget {
     ),
     // Add more dummy articles as needed
   ];
-
-  //final List<String> _clubs = clubController.sportsTypes;
 
   // Inside UserDashboardScreen build method
   Widget userInformationCard() {
@@ -76,54 +76,139 @@ class UserDashboardScreen extends StatelessWidget {
   }
 
 // Inside UserDashboardScreen build method
-  Widget selectCategorySection() {
-    // Logic to fetch upcoming games for each club
-    List<String> clubs = clubController.sportsTypes;
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Category',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-          ),
-          SizedBox(height: 16.0),
-          SizedBox(
-            width: double.infinity,
-            child: Center(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: clubs.length,
-                itemBuilder: (context, index) {
-                  String club = clubs[index];
-                  // Replace this with actual dropdown widget showing upcoming games
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        club,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16.0),
-                      ),
-                      SizedBox(height: 8.0),
-                      // Replace this with dropdown widget
-                      DropdownButton<String>(
-                        items: [],
-                        onChanged: (value) {},
-                        hint: Text('Upcoming Games'),
-                      ),
-                      SizedBox(height: 16.0),
-                    ],
-                  );
-                },
-              ),
+// Inside UserDashboardScreen class
+
+// Inside selectCategorySection method
+// Inside UserDashboardScreen class
+
+// Inside selectCategorySection method
+Widget selectCategorySection() {
+  // Logic to fetch upcoming games for each club
+  List<String> sportsTypes = clubController.sportsTypes;
+  return Container(
+    margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Select Sport Category',
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold, fontSize: 18.0),
+        ),
+        SizedBox(height: 16.0),
+        SizedBox(
+          width: double.infinity,
+          child: Center(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: sportsTypes.length,
+              itemBuilder: (context, index) {
+                String sport = sportsTypes[index];
+                // Fetch fixtures for this sport
+                List<Fixture> fixtures = clubController.fixtures
+                    .where((fixture) => fixture.sport == sport)
+                    .toList();
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      sport,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16.0),
+                    ),
+                    SizedBox(height: 8.0),
+                    // Replace this with dropdown widget to select fixtures
+                    DropdownButton<Fixture>(
+                      items: fixtures
+                          .map<DropdownMenuItem<Fixture>>((Fixture fixture) {
+                        final team1 = clubController.clubsTeamsData.firstWhere(
+                          (team) => team.id == fixture.team1Id,
+                          orElse: () => ClubTeamsData(name: ''),
+                        );
+                        final team2 = clubController.clubsTeamsData.firstWhere(
+                          (team) => team.id == fixture.team2Id,
+                          orElse: () => ClubTeamsData(name: ''),
+                        );
+
+                        return DropdownMenuItem<Fixture>(
+                          value: fixture,
+                          child: Text(
+                            '${team1.name ?? 'Team 1'} vs ${team2.name ?? 'Team 2'}',
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (selectedFixture) {
+                        // Handle selected fixture
+                      },
+                      hint: Text('Select Fixture'),
+                    ),
+                    SizedBox(height: 16.0),
+                  ],
+                );
+              },
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+
+
+
+
+  // Widget selectCategorySection() {
+  //   // Logic to fetch upcoming games for each club
+  //   // if sport == cluBcontroller.fixtures.sport => place the fixture in same sport category
+  //   List<String> sport = clubController.sportsTypes;
+  //   return Container(
+  //     margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(
+  //           'Select Sport Category',
+  //           style: GoogleFonts.poppins(
+  //               fontWeight: FontWeight.bold, fontSize: 18.0),
+  //         ),
+  //         SizedBox(height: 16.0),
+  //         SizedBox(
+  //           width: double.infinity,
+  //           child: Center(
+  //             child: ListView.builder(
+  //               shrinkWrap: true,
+  //               itemCount: sport.length,
+  //               itemBuilder: (context, index) {
+  //                 String club = sport[index];
+  //                 // Replace this with actual dropdown widget showing upcoming games
+  //                 return Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   children: [
+  //                     Text(
+  //                       club,
+  //                       style: TextStyle(
+  //                           fontWeight: FontWeight.bold, fontSize: 16.0),
+  //                     ),
+  //                     SizedBox(height: 8.0),
+  //                     // Replace this with dropdown widget
+  //                     DropdownButton<String>(
+  //                       items: [],
+  //                       onChanged: (value) {},
+  //                       hint: Text('Upcoming Games'),
+  //                     ),
+  //                     SizedBox(height: 16.0),
+  //                   ],
+  //                 );
+  //               },
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
 // Inside UserDashboardScreen build method
   Widget whatsNewSection() {

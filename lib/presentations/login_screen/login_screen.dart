@@ -18,28 +18,36 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.grey, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        padding: EdgeInsets.all(16.0),
-        child: controller.isLoading.value
-            ? Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Form(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 64.0),
+                // Add Lottie animation widget above the text fields
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 16.0),
+                    Lottie.asset('assets/animations/login_animation.json',
+                        width: 200, height: 200),
+                    SizedBox(width: 16.0),
+                  ],
+                ),
+                SizedBox(height: 24.0),
+                Divider(),
+                SizedBox(height: 24.0),
+                Form(
                   key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Add Lottie animation widget above the text fields
-                      Lottie.asset('assets/animations/login_animation.json',
-                          width: 200, height: 200),
-                      SizedBox(height: 16),
+                      // Add spacing and divider between lottie and email field
+                      //SizedBox(height: 24.0),
+                      // Divider(),
+                      // SizedBox(height: 24.0),
                       // Wrap the text fields with containers to apply shadows
                       Container(
                         decoration: BoxDecoration(
@@ -85,7 +93,7 @@ class LoginScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24.0),
                       // Wrap the text fields with containers to apply shadows
                       Container(
                         decoration: BoxDecoration(
@@ -128,7 +136,7 @@ class LoginScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -143,7 +151,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24.0),
                       // Wrap the login button with a container to apply shadows
                       SizedBox(
                         width: double.infinity,
@@ -177,7 +185,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 24.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -199,7 +207,10 @@ class LoginScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
