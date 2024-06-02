@@ -30,12 +30,10 @@ class UserDashboardScreen extends StatelessWidget {
     // Add more dummy articles as needed
   ];
 
-  // Inside UserDashboardScreen build method
   Widget userInformationCard() {
     final firstName = GetStorage().read('first_name') ?? '';
     final lastName = GetStorage().read('last_name') ?? '';
-    final imageUrl = GetStorage().read('image_url') ??
-        ''; // Replace 'image_url' with your key
+    final imageUrl = GetStorage().read('image_url') ?? '';
 
     return Container(
       padding: EdgeInsets.all(16.0),
@@ -47,81 +45,99 @@ class UserDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(imageUrl),
-                radius: 30.0,
-              ),
-              SizedBox(width: 16.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome, $firstName $lastName!',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+          ConstrainedBox(
+            constraints: BoxConstraints(minWidth: double.infinity),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(imageUrl),
+                  radius: 30.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome, $firstName $lastName!',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 4.0),
+                      Text(
+                        'View your sports details and updates here.',
+                        style: GoogleFonts.nunito(color: Colors.grey),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    'View your sports details and updates here.',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-// Inside UserDashboardScreen build method
-// Inside UserDashboardScreen class
-
-// Inside selectCategorySection method
-// Inside UserDashboardScreen class
-
-// Inside selectCategorySection method
-Widget selectCategorySection() {
-  // Logic to fetch upcoming games for each club
-  List<String> sportsTypes = clubController.sportsTypes;
-  return Container(
-    margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Select Sport Category',
-          style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold, fontSize: 18.0),
-        ),
-        SizedBox(height: 16.0),
-        SizedBox(
-          width: double.infinity,
-          child: Center(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: sportsTypes.length,
-              itemBuilder: (context, index) {
-                String sport = sportsTypes[index];
-                // Fetch fixtures for this sport
-                List<Fixture> fixtures = clubController.fixtures
-                    .where((fixture) => fixture.sport == sport)
-                    .toList();
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      sport,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16.0),
+  Widget selectCategorySection() {
+    List<String> sportsTypes = clubController.sportsTypes;
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      padding: EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 7,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Select Sport Category',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 20.0,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 20.0),
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: sportsTypes.length,
+            itemBuilder: (context, index) {
+              String sport = sportsTypes[index];
+              List<Fixture> fixtures = clubController.fixtures
+                  .where((fixture) => fixture.sport == sport)
+                  .toList();
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    sport,
+                    style: GoogleFonts.nunito(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                      color: Colors.black87,
                     ),
-                    SizedBox(height: 8.0),
-                    // Replace this with dropdown widget to select fixtures
-                    DropdownButton<Fixture>(
-                      items: fixtures
-                          .map<DropdownMenuItem<Fixture>>((Fixture fixture) {
+                  ),
+                  SizedBox(height: 12.0),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButton<Fixture>(
+                      items: fixtures.map((Fixture fixture) {
                         final team1 = clubController.clubsTeamsData.firstWhere(
                           (team) => team.id == fixture.team1Id,
                           orElse: () => ClubTeamsData(name: ''),
@@ -130,89 +146,36 @@ Widget selectCategorySection() {
                           (team) => team.id == fixture.team2Id,
                           orElse: () => ClubTeamsData(name: ''),
                         );
-
                         return DropdownMenuItem<Fixture>(
                           value: fixture,
                           child: Text(
                             '${team1.name ?? 'Team 1'} vs ${team2.name ?? 'Team 2'}',
+                            style: GoogleFonts.nunito(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w300),
                           ),
                         );
                       }).toList(),
                       onChanged: (selectedFixture) {
                         // Handle selected fixture
                       },
-                      hint: Text('Select Fixture'),
+                      hint: Text(
+                        'Select Fixture',
+                        style: GoogleFonts.nunito(color: Colors.grey),
+                      ),
                     ),
-                    SizedBox(height: 16.0),
-                  ],
-                );
-              },
-            ),
+                  ),
+                  SizedBox(height: 16.0),
+                ],
+              );
+            },
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-
-
-
-
-  // Widget selectCategorySection() {
-  //   // Logic to fetch upcoming games for each club
-  //   // if sport == cluBcontroller.fixtures.sport => place the fixture in same sport category
-  //   List<String> sport = clubController.sportsTypes;
-  //   return Container(
-  //     margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Text(
-  //           'Select Sport Category',
-  //           style: GoogleFonts.poppins(
-  //               fontWeight: FontWeight.bold, fontSize: 18.0),
-  //         ),
-  //         SizedBox(height: 16.0),
-  //         SizedBox(
-  //           width: double.infinity,
-  //           child: Center(
-  //             child: ListView.builder(
-  //               shrinkWrap: true,
-  //               itemCount: sport.length,
-  //               itemBuilder: (context, index) {
-  //                 String club = sport[index];
-  //                 // Replace this with actual dropdown widget showing upcoming games
-  //                 return Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.center,
-  //                   children: [
-  //                     Text(
-  //                       club,
-  //                       style: TextStyle(
-  //                           fontWeight: FontWeight.bold, fontSize: 16.0),
-  //                     ),
-  //                     SizedBox(height: 8.0),
-  //                     // Replace this with dropdown widget
-  //                     DropdownButton<String>(
-  //                       items: [],
-  //                       onChanged: (value) {},
-  //                       hint: Text('Upcoming Games'),
-  //                     ),
-  //                     SizedBox(height: 16.0),
-  //                   ],
-  //                 );
-  //               },
-  //             ),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-// Inside UserDashboardScreen build method
   Widget whatsNewSection() {
-    // Logic to fetch articles
     List<Article> articles = dummyArticles;
     return Container(
       margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
@@ -250,16 +213,22 @@ Widget selectCategorySection() {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bool isLargeScreen = screenWidth > 1200;
+    final bool isMediumScreen = screenWidth > 600 && screenWidth <= 1200;
+    final bool isSmallScreen = screenWidth <= 600;
+
     return Scaffold(
       drawer: CustomDrawer(
         context: context,
-      ), // Pass imageUrl to the CustomDrawer
+      ),
       appBar: AppBar(
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
               onPressed: () {
-                Scaffold.of(context).openDrawer(); // Open drawer on icon tap
+                Scaffold.of(context).openDrawer();
               },
               icon: const Icon(Icons.menu_rounded),
             );
@@ -269,7 +238,7 @@ Widget selectCategorySection() {
         elevation: 0,
         title: Text(
           'Sports Center',
-          style: GoogleFonts.nunito(fontSize: 17),
+          style: GoogleFonts.nunito(fontSize: isSmallScreen ? 14 : 17),
         ),
         actions: [
           IconButton(
@@ -283,7 +252,9 @@ Widget selectCategorySection() {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             userInformationCard(),
+            SizedBox(height: 20.0),
             selectCategorySection(),
+            SizedBox(height: 20.0),
             whatsNewSection(),
           ],
         ),
