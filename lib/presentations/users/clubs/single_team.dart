@@ -14,6 +14,18 @@ class CreateSingleTeam extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'New Club',
+          style: GoogleFonts.nunito(),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        actions: [
+          IconButton(
+              onPressed: () {}, icon: Icon(Icons.notifications_active_outlined))
+        ],
+      ),
       body: Obx(() {
         if (clubController.isLoading.value) {
           return Center(

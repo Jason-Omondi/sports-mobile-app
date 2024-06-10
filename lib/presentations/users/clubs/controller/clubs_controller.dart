@@ -95,7 +95,7 @@ class ClubController extends GetxController {
     selectedSport.value = sportsTypes.isNotEmpty ? sportsTypes.first : '';
     selectedCounty.value = counties.isNotEmpty ? counties.first : '';
     fetchAllClubs();
-    fetchAllFixtures();
+    //fetchAllFixtures();
   }
 
   String generateRandomString({int length = 10}) {
