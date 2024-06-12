@@ -50,3 +50,4 @@ web/
 windows/
 lib/firebase_options.dart
 firebase.json
+.env

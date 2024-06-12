@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'package:get/get.dart';
+import 'manage_fixtures.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'controller/clubs_controller.dart';
@@ -29,66 +30,63 @@ class FixturesScreen extends StatelessWidget {
         ],
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: clubController.isLoading.value
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text(
+                    'Processing request...',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            )
+          : Stack(
               children: [
-                Text(
-                  'Create Fixture',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Create Fixture',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      _buildFixtureForm(),
+                      SizedBox(height: 20),
+                      Divider(
+                        thickness: 5,
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Existing Fixtures',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Expanded(child: _buildFixtureList()),
+                    ],
                   ),
                 ),
-                SizedBox(height: 10),
-                _buildFixtureForm(),
-                SizedBox(height: 20),
-                Divider(
-                  thickness: 5,
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Existing Fixtures',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Expanded(child: _buildFixtureList()),
               ],
             ),
-          ),
-          Obx(
-            () => clubController.isLoading.value
-                ? Container(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 20),
-                          Text(
-                            'Processing request...',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : SizedBox.shrink(),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildFixtureForm() {
     //final clubController = Get.find<ClubController>();
+    String? _pickedDate =
+        //DateTime.now().toString();
+        DateFormat("dd/MM/yyyy").format(clubController.matchDateController);
 
     return Form(
       child: Column(
@@ -163,9 +161,10 @@ class FixturesScreen extends StatelessWidget {
                 lastDate: DateTime(DateTime.now().year + 1),
               );
               if (pickedDate != null) {
-                clubController.matchDateController.text =
-                    DateFormat('dd/MM/yyyy')
-                        .format(pickedDate); // Update the controller value
+                clubController.matchDateController = pickedDate;
+                _pickedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
+                //DateFormat('dd/MM/yyyy')
+                //  .format(pickedDate); // Update the controller value
               }
             },
             child: Container(
@@ -187,7 +186,7 @@ class FixturesScreen extends StatelessWidget {
                   ),
                   Spacer(),
                   Text(
-                    clubController.matchDateController.text,
+                    _pickedDate,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -280,7 +279,8 @@ class FixturesScreen extends StatelessWidget {
         team1Id: clubController.selectedTeam1.value,
         team2Id: clubController.selectedTeam2.value,
         sport: sport!, // Set the sport dynamically
-        matchDateTime: DateTime.now(), // Replace with actual match date
+        matchDateTime: clubController
+            .matchDateController!, // Replace with actual match date
         location: clubController.locationController.text,
       );
     } else {
@@ -294,6 +294,8 @@ class FixturesScreen extends StatelessWidget {
       );
     }
   }
+
+// Existing code...
 
   Widget _buildFixtureList() {
     return Obx(
@@ -309,11 +311,42 @@ class FixturesScreen extends StatelessWidget {
                   itemCount: clubController.fixtures.length,
                   itemBuilder: (context, index) {
                     final fixture = clubController.fixtures[index];
-                    return _buildFixtureCard(fixture);
+                    return GestureDetector(
+                      onTap: () {
+                        _navigateToManageFixture(fixture.fixtureId);
+                      },
+                      child: _buildFixtureCard(fixture),
+                    );
                   },
                 ),
     );
   }
+
+  void _navigateToManageFixture(String fixtureId) {
+    Get.to(() => ManageFixtureScreen(fixtureId: fixtureId));
+  }
+
+// Existing code...
+
+  // Widget _buildFixtureList() {
+  //   return Obx(
+  //     () => clubController.isLoading.value
+  //         ? Center(child: CircularProgressIndicator())
+  //         : clubController.fixtures.isEmpty
+  //             ? Center(
+  //                 child: Text(
+  //                 'No fixtures available',
+  //                 style: GoogleFonts.nunito(),
+  //               ))
+  //             : ListView.builder(
+  //                 itemCount: clubController.fixtures.length,
+  //                 itemBuilder: (context, index) {
+  //                   final fixture = clubController.fixtures[index];
+  //                   return _buildFixtureCard(fixture);
+  //                 },
+  //               ),
+  //   );
+  // }
 
   Widget _buildFixtureCard(Fixture fixture) {
     final team1 = clubController.clubsTeamsData.firstWhere(

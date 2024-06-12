@@ -37,7 +37,7 @@ class ClubCategories extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Welcome to Our Sports App!",
+                      "Manage Clubs!",
                       style: GoogleFonts.poppins(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -130,6 +130,8 @@ class ClubCategories extends StatelessWidget {
     );
   }
 }
+
+
 
 /*
 class ClubCategories extends StatelessWidget {

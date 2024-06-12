@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:get/get.dart';
 import '../all_teams_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:mpesadaraja/mpesadaraja.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../../data/models/fixtures_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/models/club_teams_model.dart';
@@ -74,7 +77,7 @@ class ClubController extends GetxController {
   String? logoUrl;
 
   //final List<ClubTeamsData> teams = <ClubTeamsData>[].obs;
-  final TextEditingController matchDateController = TextEditingController();
+  late DateTime matchDateController = DateTime.now();
   final TextEditingController locationController = TextEditingController();
   final RxString selectedTeam1 = ''.obs;
   final RxString selectedTeam2 = ''.obs;
@@ -128,7 +131,106 @@ class ClubController extends GetxController {
     }
   }
 
-  // Method to create new club
+  //mpesa stk push
+  Future<bool> performMpesaStkPush(String phoneNumber) async {
+    try {
+      final MpesaDaraja mpesaStk = MpesaDaraja(
+        consumerKey: dotenv.env['CONSUMER_KEY']!,
+        consumerSecret: dotenv.env['CONSUMER_SECRET']!,
+        passKey: dotenv.env['PASSKEY']!,
+        //accessToken: dotenv.env['ACCESS_TOKEN']!, // Ensure this is correctly set
+      );
+
+      // Validate and set the access token
+      //await mpesaStk.li();
+
+      final Response resp = await mpesaStk.lipaNaMpesaStk(
+        dotenv.env['SHORT_CODE']!,
+        10,
+        phoneNumber,
+        dotenv.env['SHORT_CODE']!,
+        phoneNumber,
+        dotenv.env['CALLBACK_URL']!,
+        'accountReference',
+        'Registration Fee',
+      );
+
+      if (!resp.hasError) {
+        debugPrint(resp.body.toString());
+        return true;
+      } else {
+        debugPrint(resp.body.toString());
+        return false;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e);
+    }
+  }
+
+  // Future<bool> performMpesaStkPush(String phoneNumber) async {
+  //   try {
+  //     final MpesaDaraja mpesaStk = MpesaDaraja(
+
+  //       consumerKey: dotenv.env['CONSUMER_KEY']!,
+  //       consumerSecret: dotenv.env['CONSUMER_SECRET']!,
+  //       passKey: dotenv.env['PASSKEY']!,
+  //     ).;
+
+  //     final Response resp = await mpesaStk.lipaNaMpesaStk(
+
+  //         dotenv.env['SHORT_CODE']!,
+  //         10,
+  //         phoneNumber.toString(),
+  //         dotenv.env['SHORT_CODE']!,
+  //         phoneNumber.toString(),
+  //         dotenv.env['CALLBACK_URL']!,
+  //         'accountReference',
+  //         'Registeration Fee');
+
+  //     debugPrint(resp.body.toString());
+  //     debugPrint(resp.bodyString.toString());
+
+  //     if (!resp.hasError) {
+  //       debugPrint(resp.body.toString());
+  //       debugPrint(resp.bodyString.toString());
+  //       return true;
+  //     } else {
+  //        debugPrint(resp.body.toString());
+  //       debugPrint(resp.bodyString.toString());
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     debugPrint(e.toString());
+  //     throw Exception();
+  //   }
+  // }
+
+  // Method to create a new club
+
+  // Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
+  //   isLoading.value = true;
+  //   try {
+  //     bool paymentSuccessful = await performMpesaStkPush(phoneNumber);
+  //     clubData.hasPaidRegistrationFee = paymentSuccessful;
+  //     if (paymentSuccessful) {
+  //       // Proceed to save club data in Firestore
+  //       await FirebaseFirestore.instance
+  //           .collection('clubs')
+  //           .doc(clubData.id)
+  //           .set(clubData.toJson());
+  //       Get.snackbar("Success", "Club created successfully!");
+  //     } else {
+  //       Get.snackbar("Error", "Payment unsuccessful. Please try again.");
+  //     }
+  //   } catch (e) {
+  //     print('Error during club creation: $e');
+  //     Get.snackbar("Error", "An error occurred while creating the club.");
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
   Future<void> createNewClub(ClubTeamsData clubData) async {
     try {
       isLoading(true);
@@ -164,7 +266,7 @@ class ClubController extends GetxController {
       Get.to(() => TeamsDataScreen());
     } catch (e) {
       print('Error creating new club: $e');
-      // Show error snackbar
+      //Show error snackbar
       Get.snackbar('Error', 'Something went wrong!',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.redAccent,
@@ -405,7 +507,155 @@ class ClubController extends GetxController {
       isLoading(false);
     }
   }
+
+  // Method to update fixture date
+  Future<void> updateFixtureDate(String fixtureId, String newDate) async {
+    try {
+      isLoading(true);
+
+      // Update fixture date in Firestore
+      await FirebaseFirestore.instance
+          .collection('fixtures')
+          .doc(fixtureId)
+          .update({
+        'matchDateTime': newDate,
+      });
+
+      // Fetch updated fixtures
+      await fetchAllFixtures();
+
+      // Show success snackbar
+      Get.snackbar(
+        'Success',
+        'Fixture date updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print('Error updating fixture date: $e');
+      // Show error snackbar
+      Get.snackbar(
+        'Error',
+        'Failed to update fixture date: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Method to update fixture result
+  Future<void> updateFixtureResult(String fixtureId, String newResult) async {
+    try {
+      isLoading(true);
+
+      // Update fixture result in Firestore
+      await FirebaseFirestore.instance
+          .collection('fixtures')
+          .doc(fixtureId)
+          .update({
+        'result': newResult,
+      });
+
+      // Fetch updated fixtures
+      await fetchAllFixtures();
+
+      // Show success snackbar
+      Get.snackbar(
+        'Success',
+        'Fixture result updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print('Error updating fixture result: $e');
+      // Show error snackbar
+      Get.snackbar(
+        'Error',
+        'Failed to update fixture result: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // Method to update fixture location
+  Future<void> updateFixtureLocation(
+      String fixtureId, String newLocation) async {
+    try {
+      isLoading(true);
+
+      // Update fixture location in Firestore
+      await FirebaseFirestore.instance
+          .collection('fixtures')
+          .doc(fixtureId)
+          .update({
+        'location': newLocation,
+      });
+
+      // Fetch updated fixtures
+      await fetchAllFixtures();
+
+      // Show success snackbar
+      Get.snackbar(
+        'Success',
+        'Fixture location updated successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print('Error updating fixture location: $e');
+      // Show error snackbar
+      Get.snackbar(
+        'Error',
+        'Failed to update fixture location: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
 }
+
+
+ // Future<bool> performMpesaStkPush(dynamic phoneNumber) async {
+  //   try {
+  //     final MpesaResponse response = await FlutterMpesaSTK(
+  //             dotenv.env['CONSUMER_KEY']!,
+  //             dotenv.env['CONSUMER_SECRET']!,
+  //             dotenv.env['PASSKEY']!, // stk_password
+  //             dotenv.env['SHORT_CODE']!,
+  //             dotenv.env['CALLBACK_URL']!,
+  //             'Test Payment', // defaultMessage,
+  //             env: "sandbox")
+  //         .stkPush(Mpesa(
+  //       10,
+  //       phoneNumber,
+  //     ));
+
+  //     debugPrint("M-Pesa response: ${response.body}");
+
+  //     if (response.status == 200) {
+  //       return true;
+  //     } else {
+  //       debugPrint("M-Pesa STK push failed with status: ${response.status}");
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Error during M-Pesa STK push: $e');
+  //     return false; // Return false instead of throwing an exception
+  //   }
+  // }
 
 
 

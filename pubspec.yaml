@@ -13,18 +13,26 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  get: ^4.6.5
-  lottie: ^2.3.2
-  firebase_core: ^2.24.2
-  flutter_launcher_icons: ^0.13.1
-  firebase_auth: ^4.16.0
-  get_storage: ^2.1.1
-  cloud_firestore: ^4.14.0
-  email_validator: ^2.1.17
+  get: 
+  lottie: 
+  firebase_core:
+  flutter_launcher_icons:
+  firebase_auth:
+  get_storage:
+  cloud_firestore:
+  email_validator:
   google_fonts: ^4.0.4
-  image_picker: ^1.0.4
-  firebase_storage: ^11.6.0
-  intl: ^0.18.1
+  image_picker:
+  firebase_storage:
+  intl: 
+  http:
+  #flutter_mpesa_stk: 
+  #mpesa_flutter_plugin:
+  flutter_dotenv:
+  mpesadaraja:
+    git:
+      url: https://github.com/your-username/mpesa-daraja-plugin.git
+      ref: main
 
 flutter_icons:
   android: true
@@ -51,3 +59,4 @@ flutter:
     - assets/animations/splash_animation.json
     - assets/animations/login_animation.json
     - assets/animations/clubanimation.json
+    - .env
