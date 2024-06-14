@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../presentations/admins/admin_profile_screen.dart';
+import '../../presentations/admins/news_articles_screen.dart';
 import '../../presentations/users/clubs/club_categories.dart';
 import 'package:sportsapp/presentations/intro_screen/splash_screen.dart';
 import '../../presentations/login_screen/controller/login_controller.dart';
@@ -70,34 +72,29 @@ class CustomDrawer extends StatelessWidget {
               color: Colors.blue,
             ),
           ),
-          ListTile(
-            title: Text(
-              'Clubs',
-              style: GoogleFonts.nunito(),
-            ),
-            onTap: () {
-              // Navigate to Clubs screen
-              Get.to(() => ClubCategories(loginController: loginController));
-            },
-          ),
+          //if user role form get storage == admin show below widget
           ListTile(
             title: Text(
               'News',
               style: GoogleFonts.nunito(),
             ),
             onTap: () {
-              // Navigate to News screen
+              Get.to(() => CreateEventsSCreen());
             },
           ),
-          ListTile(
-            title: Text(
-              'Settings',
-              style: GoogleFonts.nunito(),
+          if (GetStorage().read('user_role') == 'admin')
+            ListTile(
+              title: Text(
+                'Profile',
+                style: GoogleFonts.nunito(),
+              ),
+              onTap: () {
+                // Navigate to manage screen after cheking userRole == admin from get storage
+                Get.to(() => ManageAdmins());
+
+                // get to user profile if userRoler == user
+              },
             ),
-            onTap: () {
-              // Navigate to Settings screen
-            },
-          ),
           ListTile(
             title: Text(
               'FAQs',

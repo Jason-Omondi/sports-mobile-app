@@ -1,3 +1,4 @@
+import 'view_fixtures.dart';
 import 'package:get/get.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import '../../../data/models/articles_model.dart';
 import '../../../data/models/club_teams_model.dart';
 import 'package:sportsapp/presentations/users/clubs/controller/clubs_controller.dart';
 import 'package:sportsapp/presentations/login_screen/controller/login_controller.dart';
+
 
 
 class UserDashboardScreen extends StatefulWidget {
@@ -95,6 +97,115 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     );
   }
 
+
+//new
+Widget selectCategorySection() {
+    return Obx(() {
+      if (clubController.isLoading.value) {
+        return Center(child: CircularProgressIndicator());
+      } else {
+        List<String> sportsTypes = clubController.sportsTypes;
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+          padding: EdgeInsets.all(20.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 3,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Sport Category',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 20.0),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: sportsTypes.length,
+                itemBuilder: (context, index) {
+                  String sport = sportsTypes[index];
+                  List<Fixture> fixtures = clubController.fixtures
+                      .where((fixture) => fixture.sport == sport)
+                      .toList();
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        sport,
+                        style: GoogleFonts.nunito(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18.0,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 12.0),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: DropdownButton<Fixture>(
+                          items: fixtures.map((Fixture fixture) {
+                            final team1 = clubController.clubsTeamsData.firstWhere(
+                              (team) => team.id == fixture.team1Id,
+                              orElse: () => ClubTeamsData(name: ''),
+                            );
+                            final team2 = clubController.clubsTeamsData.firstWhere(
+                              (team) => team.id == fixture.team2Id,
+                              orElse: () => ClubTeamsData(name: ''),
+                            );
+                            return DropdownMenuItem<Fixture>(
+                              value: fixture,
+                              child: Text(
+                                '${team1.name ?? 'Team 1'} vs ${team2.name ?? 'Team 2'}',
+                                style: GoogleFonts.nunito(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (selectedFixture) {
+                            if (selectedFixture != null) {
+                              Get.to(() => ViewFixtureScreen(fixtureId: selectedFixture.fixtureId));
+                            }
+                          },
+                          hint: Text(
+                            'Select Fixture',
+                            style: GoogleFonts.nunito(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      }
+    });
+  }
+
+
+
+/*
   Widget selectCategorySection() {
     return Obx(() {
       if (clubController.isLoading.value) {
@@ -196,7 +307,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       }
     });
   }
-
+*/
   Widget whatsNewSection() {
     List<Article> articles = dummyArticles;
     return Container(

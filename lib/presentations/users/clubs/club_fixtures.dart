@@ -8,10 +8,21 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/fixtures_model.dart';
 import '../../../data/models/club_teams_model.dart';
 
-class FixturesScreen extends StatelessWidget {
+class FixturesScreen extends StatefulWidget {
+  FixturesScreen({Key? key});
+
+  @override
+  State<FixturesScreen> createState() => _FixturesScreenState();
+}
+
+class _FixturesScreenState extends State<FixturesScreen> {
   final ClubController clubController = Get.find();
 
-  FixturesScreen({Key? key});
+  @override
+  void initState() {
+    super.initState();
+    clubController.fetchAllFixtures();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +307,6 @@ class FixturesScreen extends StatelessWidget {
   }
 
 // Existing code...
-
   Widget _buildFixtureList() {
     return Obx(
       () => clubController.isLoading.value
@@ -327,27 +337,6 @@ class FixturesScreen extends StatelessWidget {
   }
 
 // Existing code...
-
-  // Widget _buildFixtureList() {
-  //   return Obx(
-  //     () => clubController.isLoading.value
-  //         ? Center(child: CircularProgressIndicator())
-  //         : clubController.fixtures.isEmpty
-  //             ? Center(
-  //                 child: Text(
-  //                 'No fixtures available',
-  //                 style: GoogleFonts.nunito(),
-  //               ))
-  //             : ListView.builder(
-  //                 itemCount: clubController.fixtures.length,
-  //                 itemBuilder: (context, index) {
-  //                   final fixture = clubController.fixtures[index];
-  //                   return _buildFixtureCard(fixture);
-  //                 },
-  //               ),
-  //   );
-  // }
-
   Widget _buildFixtureCard(Fixture fixture) {
     final team1 = clubController.clubsTeamsData.firstWhere(
       (team) => team.id == fixture.team1Id,

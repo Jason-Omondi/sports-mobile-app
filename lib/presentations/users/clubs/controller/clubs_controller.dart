@@ -329,7 +329,7 @@ class ClubController extends GetxController {
 // Method to fetch all fixtures and store them in a reactive list
   Future<void> fetchAllFixtures() async {
     try {
-      isLoading(true);
+      //isLoading(true);
       fixtures.clear();
 
       // Retrieve all records from Firestore
@@ -340,7 +340,9 @@ class ClubController extends GetxController {
       querySnapshot.docs.forEach((doc) {
         final fixture = Fixture.fromJson(doc.data() as Map<String, dynamic>);
         fixtures.add(fixture);
+        //isLoading(false);
       });
+
       print('fixtures: ${fixtures.length}');
 
       // Show success snackbar

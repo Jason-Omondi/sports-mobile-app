@@ -3,7 +3,7 @@ description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
@@ -30,9 +30,6 @@ dependencies:
   #mpesa_flutter_plugin:
   flutter_dotenv:
   mpesadaraja:
-    git:
-      url: https://github.com/your-username/mpesa-daraja-plugin.git
-      ref: main
 
 flutter_icons:
   android: true

@@ -7,6 +7,7 @@ class Fixture {
   String location;
   String? result; // Optional field for storing match result
   List<String>? playersList; // Optional field for storing list of players
+  //recent matches will store match result, teamid 1 and teamid 2, locaton and matchDate time
 
   Fixture({
     required this.fixtureId,

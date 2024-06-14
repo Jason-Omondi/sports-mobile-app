@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'controller/clubs_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../utils/widgets/user_drawer.dart';
 import '../../login_screen/controller/login_controller.dart';
 import 'package:sportsapp/presentations/users/clubs/single_team.dart';
 
@@ -25,6 +26,9 @@ class ClubCategories extends StatelessWidget {
           "Sports App",
           style: GoogleFonts.nunito(fontSize: 24, fontWeight: FontWeight.bold),
         ),
+      ),
+      drawer: CustomDrawer(
+        context: context,
       ),
       body: Column(
         children: [

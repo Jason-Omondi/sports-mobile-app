@@ -11,38 +11,101 @@ class TeamsDataScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'All Clubs',
-          style: GoogleFonts.nunito(),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Clubs by Sport',
+            style: GoogleFonts.nunito(),
+          ),
+          centerTitle: true,
+          elevation: 0,
+          bottom: TabBar(
+            isScrollable: true,
+            tabs: [
+              Tab(text: 'Football'),
+              Tab(text: 'Basketball'),
+              Tab(text: 'Rugby'),
+            ],
+          ),
         ),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-              onPressed: () {}, icon: Icon(Icons.notifications_active_outlined))
-        ],
-      ),
-      body: Obx(
-        () => clubController.isLoading.value
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : clubController.clubsTeamsData.isEmpty
-                ? Center(
-                    child: Text(
-                      'No data available',
-                      style: GoogleFonts.nunito(),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: clubController.clubsTeamsData.length,
-                    itemBuilder: (context, index) {
-                      final club = clubController.clubsTeamsData[index];
-                      return _buildClubCard(context, club);
-                    },
-                  ),
+        body: TabBarView(
+          children: [
+            Obx(
+              () => clubController.isLoading.value
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : clubController.clubsTeamsData.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No football clubs data available',
+                            style: GoogleFonts.nunito(),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: clubController.clubsTeamsData.length,
+                          itemBuilder: (context, index) {
+                            final club = clubController.clubsTeamsData[index];
+                            if (club.sport == 'Football') {
+                              return _buildClubCard(context, club);
+                            } else {
+                              return SizedBox.shrink();
+                            }
+                          },
+                        ),
+            ),
+            Obx(
+              () => clubController.isLoading.value
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : clubController.clubsTeamsData.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No basketball clubs data available',
+                            style: GoogleFonts.nunito(),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: clubController.clubsTeamsData.length,
+                          itemBuilder: (context, index) {
+                            final club = clubController.clubsTeamsData[index];
+                            if (club.sport == 'Basketball') {
+                              return _buildClubCard(context, club);
+                            } else {
+                              return SizedBox.shrink();
+                            }
+                          },
+                        ),
+            ),
+            Obx(
+              () => clubController.isLoading.value
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : clubController.clubsTeamsData.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No volleyball clubs data available',
+                            style: GoogleFonts.nunito(),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: clubController.clubsTeamsData.length,
+                          itemBuilder: (context, index) {
+                            final club = clubController.clubsTeamsData[index];
+                            if (club.sport == 'Volleyball') {
+                              return _buildClubCard(context, club);
+                            } else {
+                              return SizedBox.shrink();
+                            }
+                          },
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -92,11 +155,6 @@ class TeamsDataScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text(
-                        'Sport: ${club.sport}',
-                        style: GoogleFonts.nunito(),
-                      ),
-                      SizedBox(height: 4),
                       Text(
                         'County: ${club.county}',
                         style: GoogleFonts.nunito(),
@@ -156,7 +214,6 @@ class TeamsDataScreen extends StatelessWidget {
     );
   }
 }
-
 
 
 
