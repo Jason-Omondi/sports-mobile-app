@@ -10,9 +10,11 @@ import '../../../../data/models/fixtures_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/models/club_teams_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../../admins/controller/admin_controller.dart';
 import '../../../login_screen/controller/login_controller.dart';
 
 class ClubController extends GetxController {
+  final AdminController adminController = Get.put(AdminController());
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode locationFocusNode = FocusNode();
   final FocusNode postalCodeFocusNode = FocusNode();
@@ -62,11 +64,7 @@ class ClubController extends GetxController {
     'Tana River',
     'Tharaka Nithi',
     'Trans Nzoia',
-    //'Turkana',
     'Uasin Gishu',
-    //'Vihiga',
-    //'Wajir',
-    //'West Pokot'
   ];
 
   final TextEditingController? postalCodeController = TextEditingController();

@@ -4,6 +4,7 @@ import 'all_teams_screen.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'controller/clubs_controller.dart';
+import '../../admins/admin_equipment.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../utils/widgets/user_drawer.dart';
 import '../../login_screen/controller/login_controller.dart';
@@ -88,7 +89,11 @@ class ClubCategories extends StatelessWidget {
                     title: 'Manage Fixtures',
                     onTap: () => Get.to(() => FixturesScreen()),
                   ),
-                  // Add more categories as needed
+                  // _buildCategoryCard(
+                  //     icon: Icons.kitesurfing,
+                  //     title: 'Equipment',
+                  //     onTap: () => Get.to(() => EquipmentScreen()),)
+                  // // Add more categories as needed
                 ],
               ),
             ),

@@ -5,7 +5,6 @@ import 'package:get_storage/get_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class AuthController extends GetxController {
   Rx<Users?> user = Rx<Users?>(null);
   RxList<Users> userList = RxList<Users>([]);
@@ -43,6 +42,10 @@ class AuthController extends GetxController {
   //login functionality
 
   // register functionality
+
+  //reset email
+
+  //logout
 
   // check if email exist
   bool checkIfEmailExists(String email) {

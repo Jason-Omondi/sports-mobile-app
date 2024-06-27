@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import '../../admins/admin_equipment.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/club_teams_model.dart';
 import 'controller/clubs_controller.dart'; // Import your ClubController
+
 
 class TeamsDataScreen extends StatelessWidget {
   final ClubController clubController = Get.find();
@@ -162,10 +164,21 @@ class TeamsDataScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () {
-                    _confirmDelete(context, club);
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'Equipment') {
+                      Get.to(() => EquipmentScreen(teamId: club.id!,));
+                    } else if (value == 'Delete') {
+                      _confirmDelete(context, club);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return {'Equipment', 'Delete'}.map((String choice) {
+                      return PopupMenuItem<String>(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
                   },
                 ),
               ],
@@ -214,7 +227,6 @@ class TeamsDataScreen extends StatelessWidget {
     );
   }
 }
-
 
 
 
