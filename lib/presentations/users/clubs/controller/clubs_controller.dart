@@ -7,6 +7,7 @@ import 'package:mpesadaraja/mpesadaraja.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../../data/models/fixtures_model.dart';
+import '../../../../data/models/equipment_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../../data/models/club_teams_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -20,6 +21,9 @@ class ClubController extends GetxController {
   final FocusNode postalCodeFocusNode = FocusNode();
   final FocusNode contactEmailFocusNode = FocusNode();
   final LoginController loginController = Get.find();
+  TextEditingController equipmentNameController = TextEditingController();
+  TextEditingController equipmentTypeController = TextEditingController();
+  TextEditingController quantityController = TextEditingController();
   final List<String> sportsTypes = ['Football', 'Basketball', 'Rugby'];
   final List<String> counties = [
     //'Baringo',
@@ -84,6 +88,8 @@ class ClubController extends GetxController {
   RxList<ClubTeamsData> clubsTeamsData = <ClubTeamsData>[].obs;
   // Reactive list to store the fixtures fetched
   RxList<Fixture> fixtures = <Fixture>[].obs;
+  RxList<Equipment> equipments =
+      <Equipment>[].obs; // Reactive list for equipment
 
   RxBool isLoading = false.obs;
   RxBool isJuniorTeam = false.obs;
@@ -205,30 +211,6 @@ class ClubController extends GetxController {
   // }
 
   // Method to create a new club
-
-  // Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
-  //   isLoading.value = true;
-  //   try {
-  //     bool paymentSuccessful = await performMpesaStkPush(phoneNumber);
-  //     clubData.hasPaidRegistrationFee = paymentSuccessful;
-  //     if (paymentSuccessful) {
-  //       // Proceed to save club data in Firestore
-  //       await FirebaseFirestore.instance
-  //           .collection('clubs')
-  //           .doc(clubData.id)
-  //           .set(clubData.toJson());
-  //       Get.snackbar("Success", "Club created successfully!");
-  //     } else {
-  //       Get.snackbar("Error", "Payment unsuccessful. Please try again.");
-  //     }
-  //   } catch (e) {
-  //     print('Error during club creation: $e');
-  //     Get.snackbar("Error", "An error occurred while creating the club.");
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-
   Future<void> createNewClub(ClubTeamsData clubData) async {
     try {
       isLoading(true);
@@ -621,6 +603,122 @@ class ClubController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> createEquipment(Equipment equipment) async {
+    try {
+      isLoading(true);
+
+      // Check if the team has already been assigned equipment
+      final existingEquipment =
+          equipments.firstWhereOrNull((e) => e.teamId == equipment.teamId);
+      if (existingEquipment != null) {
+        Get.snackbar('Error', 'This team has already been assigned equipment',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 5));
+        return;
+      }
+
+      final docRef = FirebaseFirestore.instance.collection('equipment').doc();
+      equipment.equipmentID = docRef.id;
+      await docRef.set(equipment.toJson());
+      equipments.add(equipment);
+      Get.snackbar('Success', 'Equipment added successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } catch (e) {
+      print('Error adding equipment: $e');
+      Get.snackbar('Error', 'Failed to add equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchAllEquipment() async {
+    try {
+      isLoading(true);
+      equipments.clear();
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('equipment').get();
+      for (var doc in querySnapshot.docs) {
+        final equipment =
+            Equipment.fromJson(doc.data() as Map<String, dynamic>);
+        equipment.equipmentID =
+            doc.id; // Ensure equipmentID matches Firestore document ID
+        equipments.add(equipment);
+      }
+    } catch (e) {
+      print('Error fetching equipment: $e');
+      Get.snackbar('Error', 'Failed to fetch equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> updateEquipment(Equipment equipment) async {
+    try {
+      isLoading(true);
+      await FirebaseFirestore.instance
+          .collection('equipment')
+          .doc(equipment.equipmentID)
+          .update(equipment.toJson());
+      final index =
+          equipments.indexWhere((e) => e.equipmentID == equipment.equipmentID);
+      if (index != -1) {
+        equipments[index] = equipment;
+      }
+      Get.snackbar('Success', 'Equipment updated successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } catch (e) {
+      print('Error updating equipment: $e');
+      Get.snackbar('Error', 'Failed to update equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteEquipment(String equipmentID) async {
+    try {
+      isLoading(true);
+      await FirebaseFirestore.instance
+          .collection('equipment')
+          .doc(equipmentID)
+          .delete();
+      equipments.removeWhere((e) => e.equipmentID == equipmentID);
+      Get.snackbar('Success', 'Equipment deleted successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } catch (e) {
+      print('Error deleting equipment: $e');
+      Get.snackbar('Error', 'Failed to delete equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
     } finally {
       isLoading(false);
     }
