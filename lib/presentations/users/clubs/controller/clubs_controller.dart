@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../all_teams_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:mpesadaraja/mpesadaraja.dart';
+import '../../../../data/config/mpesa_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../../data/models/fixtures_model.dart';
@@ -78,6 +79,8 @@ class ClubController extends GetxController {
   String? clubType;
   String? logoUrl;
 
+  final MpesaService _mpesaService = MpesaService();
+
   //final List<ClubTeamsData> teams = <ClubTeamsData>[].obs;
   late DateTime matchDateController = DateTime.now();
   final TextEditingController locationController = TextEditingController();
@@ -136,84 +139,97 @@ class ClubController extends GetxController {
   }
 
   //mpesa stk push
-  Future<bool> performMpesaStkPush(String phoneNumber) async {
+  Future<bool> initiateStkPush(String phoneNumber, double amount) async {
     try {
-      final MpesaDaraja mpesaStk = MpesaDaraja(
-        consumerKey: dotenv.env['CONSUMER_KEY']!,
-        consumerSecret: dotenv.env['CONSUMER_SECRET']!,
-        passKey: dotenv.env['PASSKEY']!,
-        //accessToken: dotenv.env['ACCESS_TOKEN']!, // Ensure this is correctly set
-      );
-
-      // Validate and set the access token
-      //await mpesaStk.li();
-
-      final Response resp = await mpesaStk.lipaNaMpesaStk(
-        dotenv.env['SHORT_CODE']!,
-        10,
-        phoneNumber,
-        dotenv.env['SHORT_CODE']!,
-        phoneNumber,
-        dotenv.env['CALLBACK_URL']!,
-        'accountReference',
-        'Registration Fee',
-      );
-
-      if (!resp.hasError) {
-        debugPrint(resp.body.toString());
-        return true;
-      } else {
-        debugPrint(resp.body.toString());
-        return false;
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-      throw Exception(e);
+      isLoading.value = true;
+      await _mpesaService.lipaNaMpesa(phoneNumber, amount);
+      Get.snackbar('Success', 'STK Push sent successfully.');
+      return true;
+    } catch (error) {
+      Get.snackbar('Error', 'Failed to send STK Push. Retrying...');
+      retryStkPush(phoneNumber, amount);
+      return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  // Future<bool> performMpesaStkPush(String phoneNumber) async {
-  //   try {
-  //     final MpesaDaraja mpesaStk = MpesaDaraja(
-
-  //       consumerKey: dotenv.env['CONSUMER_KEY']!,
-  //       consumerSecret: dotenv.env['CONSUMER_SECRET']!,
-  //       passKey: dotenv.env['PASSKEY']!,
-  //     ).;
-
-  //     final Response resp = await mpesaStk.lipaNaMpesaStk(
-
-  //         dotenv.env['SHORT_CODE']!,
-  //         10,
-  //         phoneNumber.toString(),
-  //         dotenv.env['SHORT_CODE']!,
-  //         phoneNumber.toString(),
-  //         dotenv.env['CALLBACK_URL']!,
-  //         'accountReference',
-  //         'Registeration Fee');
-
-  //     debugPrint(resp.body.toString());
-  //     debugPrint(resp.bodyString.toString());
-
-  //     if (!resp.hasError) {
-  //       debugPrint(resp.body.toString());
-  //       debugPrint(resp.bodyString.toString());
-  //       return true;
-  //     } else {
-  //        debugPrint(resp.body.toString());
-  //       debugPrint(resp.bodyString.toString());
-  //       return false;
-  //     }
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //     throw Exception();
-  //   }
-  // }
+//retryStk if failed
+  Future<void> retryStkPush(String phoneNumber, double amount) async {
+    try {
+      isLoading.value = true;
+      await _mpesaService.lipaNaMpesa(phoneNumber, amount);
+      Get.snackbar('Success', 'STK Push sent successfully.',
+          duration: const Duration(seconds: 5));
+    } catch (error) {
+      Get.snackbar('Error', 'Something went wrong. Please try again later.',
+          backgroundColor: Colors.red, duration: const Duration(seconds: 5));
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   // Method to create a new club
-  Future<void> createNewClub(ClubTeamsData clubData) async {
+  Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
     try {
       isLoading(true);
+
+      // Initiate STK push
+      final stkSuccess = await initiateStkPush(phoneNumber, 10.0);
+
+      if (!stkSuccess) {
+        throw Exception('Failed to initiate STK push');
+      }
+
+      // Simulate creation with delay
+      await Future.delayed(Duration(seconds: 2));
+
+      // Save club data to Firestore with the club ID as document ID
+      await FirebaseFirestore.instance
+          .collection('clubs')
+          .doc(clubData.id)
+          .set({
+        'id': clubData.id,
+        'name': clubData.name,
+        'logoUrl': clubData.logoUrl,
+        'isJuniorTeam': clubData.isJuniorTeam,
+        'sport': clubData.sport,
+        'county': clubData.county,
+        'postalZip': clubData.postalZip,
+        'contactEmail': clubData.contactEmail,
+      });
+
+      // Add the newly created club to the reactive list
+      clubsTeamsData.add(clubData);
+
+      // Show success snackbar
+      Get.snackbar('Success', 'Club created successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+      Get.to(() => TeamsDataScreen());
+    } catch (e) {
+      print('Error creating new club: $e');
+      // Show error snackbar
+      Get.snackbar('Error', 'Failed to create club: $e',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  /*
+  Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
+    try {
+      isLoading(true);
+
+     // initiate stk push here befre storing data to firebase, if stk push returns erro then throw error and stop execution
+// hard code amount to 10
+
 
       // Simulate creation with delay
       await Future.delayed(Duration(seconds: 2));
@@ -256,6 +272,7 @@ class ClubController extends GetxController {
       isLoading(false);
     }
   }
+*/
 
   // Method to fetch all clubs and other information and store in the reactive list
   Future<void> fetchAllClubs() async {
@@ -724,6 +741,46 @@ class ClubController extends GetxController {
     }
   }
 }
+
+
+  /*
+  Future<bool> performMpesaStkPush(String phoneNumber) async {
+    try {
+      final MpesaDaraja mpesaStk = MpesaDaraja(
+        consumerKey: dotenv.env['CONSUMER_KEY']!,
+        consumerSecret: dotenv.env['CONSUMER_SECRET']!,
+        passKey: dotenv.env['PASSKEY']!,
+        //accessToken: dotenv.env['ACCESS_TOKEN']!, // Ensure this is correctly set
+      );
+
+      // Validate and set the access token
+      //await mpesaStk.li();
+
+      final Response resp = await mpesaStk.lipaNaMpesaStk(
+        dotenv.env['SHORT_CODE']!,
+        10,
+        phoneNumber,
+        dotenv.env['SHORT_CODE']!,
+        phoneNumber,
+        dotenv.env['CALLBACK_URL']!,
+        'accountReference',
+        'Registration Fee',
+      );
+
+      if (!resp.hasError) {
+        debugPrint(resp.body.toString());
+        return true;
+      } else {
+        debugPrint(resp.body.toString());
+        return false;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e);
+    }
+  }
+
+*/
 
 
  // Future<bool> performMpesaStkPush(dynamic phoneNumber) async {
