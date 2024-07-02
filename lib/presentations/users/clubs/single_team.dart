@@ -397,7 +397,7 @@ class CreateSingleTeam extends StatelessWidget {
 
   bool _isValidPhoneNumber(String phoneNumber) {
     // Validate phone number format: '2547******'
-    final RegExp regExp = RegExp(r'^2547\d{6}$');
+    final RegExp regExp = RegExp(r'^2547\d{8}$');
     return regExp.hasMatch(phoneNumber);
   }
 

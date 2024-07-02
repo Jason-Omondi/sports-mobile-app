@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/club_teams_model.dart';
 import 'controller/clubs_controller.dart'; // Import your ClubController
 
-
 class TeamsDataScreen extends StatelessWidget {
   final ClubController clubController = Get.find();
 
@@ -90,7 +89,7 @@ class TeamsDataScreen extends StatelessWidget {
                   : clubController.clubsTeamsData.isEmpty
                       ? Center(
                           child: Text(
-                            'No volleyball clubs data available',
+                            'No rugby clubs data available',
                             style: GoogleFonts.nunito(),
                           ),
                         )
@@ -98,7 +97,7 @@ class TeamsDataScreen extends StatelessWidget {
                           itemCount: clubController.clubsTeamsData.length,
                           itemBuilder: (context, index) {
                             final club = clubController.clubsTeamsData[index];
-                            if (club.sport == 'Volleyball') {
+                            if (club.sport == 'Rugby') {
                               return _buildClubCard(context, club);
                             } else {
                               return SizedBox.shrink();
@@ -167,7 +166,9 @@ class TeamsDataScreen extends StatelessWidget {
                 PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'Equipment') {
-                      Get.to(() => EquipmentScreen(teamId: club.id!,));
+                      Get.to(() => EquipmentScreen(
+                            teamId: club.id!,
+                          ));
                     } else if (value == 'Delete') {
                       _confirmDelete(context, club);
                     }
