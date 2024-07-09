@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:get/get.dart';
+import '../admin_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/users_model.dart';
@@ -98,7 +99,7 @@ class AdminController extends GetxController {
           duration: const Duration(seconds: 5),
           backgroundColor: Colors.tealAccent);
 
-      Get.back();
+      Get.off(const ManageAdmins());
 
       //user.value = newUser;
     } catch (e) {

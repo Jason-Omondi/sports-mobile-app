@@ -105,6 +105,7 @@ class ClubController extends GetxController {
     selectedSport.value = sportsTypes.isNotEmpty ? sportsTypes.first : '';
     selectedCounty.value = counties.isNotEmpty ? counties.first : '';
     fetchAllClubs();
+    fetchAllEquipment();
     //fetchAllFixtures();
   }
 
@@ -625,9 +626,36 @@ class ClubController extends GetxController {
     }
   }
 
+  Future<void> fetchAllEquipment() async {
+    try {
+      isLoading(true);
+      equipments.clear();
+      final QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('equipment').get();
+      for (var doc in querySnapshot.docs) {
+        final equipment =
+            Equipment.fromJson(doc.data() as Map<String, dynamic>);
+        equipment.equipmentID =
+            doc.id; // Ensure equipmentID matches Firestore document ID
+        equipments.add(equipment);
+      }
+      debugPrint('Equipments: ${equipments.length}');
+    } catch (e) {
+      debugPrint('Error fetching equipment: $e');
+      Get.snackbar('Error', 'Failed to fetch equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> createEquipment(Equipment equipment) async {
     try {
       isLoading(true);
+      await fetchAllEquipment();
 
       // Check if the team has already been assigned equipment
       final existingEquipment =
@@ -644,7 +672,8 @@ class ClubController extends GetxController {
       final docRef = FirebaseFirestore.instance.collection('equipment').doc();
       equipment.equipmentID = docRef.id;
       await docRef.set(equipment.toJson());
-      equipments.add(equipment);
+      //equipments.add(equipment);
+      fetchAllEquipment();
       Get.snackbar('Success', 'Equipment added successfully',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
@@ -653,31 +682,6 @@ class ClubController extends GetxController {
     } catch (e) {
       print('Error adding equipment: $e');
       Get.snackbar('Error', 'Failed to add equipment',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          duration: Duration(seconds: 5));
-    } finally {
-      isLoading(false);
-    }
-  }
-
-  Future<void> fetchAllEquipment() async {
-    try {
-      isLoading(true);
-      equipments.clear();
-      final QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('equipment').get();
-      for (var doc in querySnapshot.docs) {
-        final equipment =
-            Equipment.fromJson(doc.data() as Map<String, dynamic>);
-        equipment.equipmentID =
-            doc.id; // Ensure equipmentID matches Firestore document ID
-        equipments.add(equipment);
-      }
-    } catch (e) {
-      print('Error fetching equipment: $e');
-      Get.snackbar('Error', 'Failed to fetch equipment',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,

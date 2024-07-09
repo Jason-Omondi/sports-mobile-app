@@ -35,36 +35,80 @@ class EquipmentScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8),
+
             Expanded(
               child: Obx(
-                () => clubController.isLoading.value
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text('Processing...'),
-                          ],
+                () {
+                  if (clubController.isLoading.value) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Processing...'),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Filter equipments by teamId
+                    final teamEquipments = clubController.equipments
+                        .where((equipment) => equipment.teamId == teamId)
+                        .toList();
+
+                    if (teamEquipments.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No equipment issued to this team.',
+                          style: GoogleFonts.nunito(),
                         ),
-                      )
-                    : clubController.equipments.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No equipment issued to this team.',
-                              style: GoogleFonts.nunito(),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: clubController.equipments.length,
-                            itemBuilder: (context, index) {
-                              Equipment equipment =
-                                  clubController.equipments[index];
-                              return _buildEquipmentItem(equipment, context);
-                            },
-                          ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        itemCount: teamEquipments.length,
+                        itemBuilder: (context, index) {
+                          Equipment equipment = teamEquipments[index];
+                          return _buildEquipmentItem(equipment, context);
+                        },
+                      );
+                    }
+                  }
+                },
               ),
             ),
+
+            // Expanded(
+            //   child: Obx(
+            //     () => clubController.isLoading.value
+            //         ? Center(
+            //             child: Column(
+            //               mainAxisAlignment: MainAxisAlignment.center,
+            //               children: [
+            //                 CircularProgressIndicator(),
+            //                 SizedBox(height: 16),
+            //                 Text('Processing...'),
+            //               ],
+            //             ),
+            //           )
+            //         : clubController.equipments.isEmpty
+            //             ? Center(
+            //                 child: Text(
+            //                   'No equipment issued to this team.',
+            //                   style: GoogleFonts.nunito(),
+            //                 ),
+            //               )
+            //               //only show equipment whose team Id == teamId variable of constructor.
+            //             : ListView.builder(
+            //                 itemCount: clubController.equipments.length,
+            //                 itemBuilder: (context, index) {
+            //                   Equipment equipment =
+            //                       clubController.equipments[index];
+            //                   return _buildEquipmentItem(equipment, context);
+            //                 },
+            //               ),
+            //   ),
+            // ),
+
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
