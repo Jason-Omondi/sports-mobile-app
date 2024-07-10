@@ -720,6 +720,40 @@ class ClubController extends GetxController {
     }
   }
 
+  Future<void> returnEquipment(Equipment equipment, String condition) async {
+    try {
+      isLoading(true);
+      equipment.isReturned = true;
+      equipment.returnDate = DateTime.now();
+      equipment.condition = condition;
+      await FirebaseFirestore.instance
+          .collection('equipment')
+          .doc(equipment.equipmentID)
+          .update(equipment.toJson());
+
+      final index =
+          equipments.indexWhere((e) => e.equipmentID == equipment.equipmentID);
+      if (index != -1) {
+        equipments[index] = equipment;
+      }
+
+      Get.snackbar('Success', 'Equipment returned successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } catch (e) {
+      print('Error returning equipment: $e');
+      Get.snackbar('Error', 'Failed to return equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+
   Future<void> deleteEquipment(String equipmentID) async {
     try {
       isLoading(true);

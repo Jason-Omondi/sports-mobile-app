@@ -245,7 +245,7 @@ class EquipmentScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              // clubController.returnEquipment(equipment);
+              clubController.returnEquipment(equipment, equipment.condition!);
               Navigator.of(context).pop();
             },
             child: Text('Return', style: TextStyle(color: Colors.red)),
