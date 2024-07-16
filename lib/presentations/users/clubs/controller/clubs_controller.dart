@@ -75,6 +75,14 @@ class ClubController extends GetxController {
   final TextEditingController? postalCodeController = TextEditingController();
   final TextEditingController? clubEmailController = TextEditingController();
   final TextEditingController? nameController = TextEditingController();
+  final List<String> equipmentNames = ['Training Kits', 'Balls', 'Sports Wear'];
+  final List<String> equipmentTypes = [
+    'Footballs',
+    'Basketballs',
+    'Rugby Balls',
+    'Training Gears'
+  ];
+  final List<String> equipmentConditions = ['Good', 'Needs Repair'];
 
   String? clubType;
   String? logoUrl;
@@ -652,7 +660,7 @@ class ClubController extends GetxController {
     }
   }
 
-  Future<void> createEquipment(Equipment equipment) async {
+  /* Future<void> createEquipment(Equipment equipment) async {
     try {
       isLoading(true);
       await fetchAllEquipment();
@@ -686,6 +694,62 @@ class ClubController extends GetxController {
           backgroundColor: Colors.red,
           colorText: Colors.white,
           duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  } */
+
+  Future<void> createEquipment(Equipment equipment) async {
+    try {
+      isLoading(true);
+      await fetchAllEquipment();
+
+      // Normalize the equipment name to lowercase for comparison
+      String normalizedEquipmentName = equipment.name?.toLowerCase() ?? '';
+
+      // Check if the team has already been assigned the same type of equipment that hasn't been returned
+      final existingEquipment = equipments.firstWhereOrNull(
+        (e) =>
+            e.teamId == equipment.teamId &&
+            (e.name?.toLowerCase() ?? '') == normalizedEquipmentName &&
+            !e.isReturned,
+      );
+
+      if (existingEquipment != null) {
+        Get.snackbar(
+          'Error',
+          'This team has already been assigned this type of equipment and it has not been returned yet',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+        return;
+      }
+
+      final docRef = FirebaseFirestore.instance.collection('equipment').doc();
+      equipment.equipmentID = docRef.id;
+      await docRef.set(equipment.toJson());
+      fetchAllEquipment();
+
+      Get.snackbar(
+        'Success',
+        'Equipment added successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    } catch (e) {
+      debugPrint('Error adding equipment: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to add equipment',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
     } finally {
       isLoading(false);
     }
@@ -744,7 +808,7 @@ class ClubController extends GetxController {
           duration: Duration(seconds: 5));
     } catch (e) {
       print('Error returning equipment: $e');
-      Get.snackbar('Error', 'Failed to return equipment',
+      Get.snackbar('Error', 'Something went wrong!',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -754,14 +818,64 @@ class ClubController extends GetxController {
     }
   }
 
-  Future<void> deleteEquipment(String equipmentID) async {
+// revert method so that we can only delete equipments that sa been returned.
+  Future<void> deleteEquipment(Equipment equipment) async {
+    try {
+      isLoading(true);
+
+      // Check if equipment has been returned
+      if (!equipment.isReturned) {
+        Get.snackbar(
+          'Error',
+          'Cannot delete equipment that has not been returned.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+        return;
+      }
+
+      await FirebaseFirestore.instance
+          .collection('equipment')
+          .doc(equipment.equipmentID)
+          .delete();
+
+      // Remove the equipment from the local list
+      equipments.removeWhere((e) => e.equipmentID == equipment.equipmentID);
+
+      Get.snackbar(
+        'Success',
+        'Equipment deleted successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+    } catch (e) {
+      print('Error deleting equipment: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to delete equipment',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  /*
+  Future<void> deleteEquipment(Equipment equipment) async {
     try {
       isLoading(true);
       await FirebaseFirestore.instance
           .collection('equipment')
-          .doc(equipmentID)
+          .doc(equipment.equipmentID)
           .delete();
-      equipments.removeWhere((e) => e.equipmentID == equipmentID);
+      equipments.removeWhere((e) => e.equipmentID == equipment.equipmentID);
       Get.snackbar('Success', 'Equipment deleted successfully',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.green,
@@ -777,7 +891,7 @@ class ClubController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
+  } */
 }
 
 
