@@ -43,7 +43,7 @@ class AdminController extends GetxController {
   //fetch all users
   Future<void> fetchAllUsers() async {
     try {
-      //isLoading(true);
+      isLoading.value = true;
       allUserList.clear();
       normalUsersList.clear();
       adminUsersList.clear();
@@ -85,7 +85,7 @@ class AdminController extends GetxController {
       );
 
       Users newUser = Users(
-        userRole: 'user',
+        userRole: 'admin',
         phoneNumber: phoneNumber!,
         email: email,
         firstName: firstName!,
@@ -127,6 +127,32 @@ class AdminController extends GetxController {
     } catch (e) {
       Get.snackbar('Error!', e.toString(),
           duration: const Duration(seconds: 5));
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+//method to delete user in firestore via the email address
+  Future<void> deleteUser(String email) async {
+    try {
+      isLoading.value = true;
+      await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get()
+          .then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      });
+      Get.snackbar('Success!', 'User deleted successfully!',
+          duration: const Duration(seconds: 5));
+      await fetchAllUsers();
+    } catch (e) {
+      debugPrint("Error: $e");
+      Get.snackbar('Error!', e.toString(),
+          duration: const Duration(seconds: 5));
+      throw Exception(e);
     } finally {
       isLoading.value = false;
     }
