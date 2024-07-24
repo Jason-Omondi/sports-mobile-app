@@ -33,6 +33,8 @@ migrate_working_dir/
 .pub/
 /build/
 
+
+
 # Symbolication related
 app.*.symbols
 
@@ -51,3 +53,7 @@ windows/
 lib/firebase_options.dart
 firebase.json
 .env
+/android/
+ios/
+assets/
+macos/

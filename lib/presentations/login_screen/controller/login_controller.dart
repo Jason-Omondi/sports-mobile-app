@@ -19,13 +19,14 @@ class LoginController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAllUsers();
+    //fetchAllUsers();
   }
 
   // Fetch all users
   Future<void> fetchAllUsers() async {
     try {
-      //isLoading(true);
+      isLoading(true);
+      //isLoading.value = true;
       userList.clear();
       normalUsersList.clear();
       adminUsersList.clear();
@@ -37,12 +38,14 @@ class LoginController extends GetxController {
       userList.assignAll(users);
       normalUsersList.assignAll(users.where((user) => user.userRole == 'user'));
       adminUsersList.assignAll(users.where((user) => user.userRole == 'admin'));
-      debugPrint(userList.length.toString());
+      debugPrint("Users ${userList.length.toString()}");
     } catch (e) {
       debugPrint("Error $e");
+      isLoading.value = false;
       throw Exception(e);
     } finally {
       isLoading(false);
+      //isLoading.value = false;
     }
   }
 
@@ -69,53 +72,75 @@ class LoginController extends GetxController {
   // Login functionality
   Future<void> loginUser(String email, String password) async {
     try {
-      await fetchAllUsers();
       isLoading(true);
+      //await fetchAllUsers();
+
       if (!checkIfEmailExists(email)) {
-        Get.snackbar('Info!',
-            "$email does not exist in our systems, consider registering!",
-            duration: Duration(seconds: 5), backgroundColor: Colors.red[300]);
-        throw Exception('User with email $email does not exist.');
+        Get.snackbar(
+          'Error',
+          "This email is not registered. Please check your email or sign up.",
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red[300],
+        );
+        return;
       }
 
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      debugPrint('here...');
 
-      Users user = userList.firstWhere((user) => user.email == email);
+      try {
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        debugPrint('here...$userCredential');
+        Users user = userList.firstWhere((user) => user.email == email);
 
-      if (user.userRole == null || user.userRole.isEmpty) {
-        throw Exception('User role not defined for $email');
+        if (user.userRole == null || user.userRole.isEmpty) {
+          throw Exception('User role not defined for $email');
+        }
+
+        // Save user information to GetStorage
+        saveUserInfoToStorage(
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          userRole: user.userRole,
+          phoneNumber: user.phoneNumber,
+          imageUrl: user.imageUrl,
+        );
+
+        debugPrint('here...');
+
+        // Navigate based on user role
+        if (user.userRole == 'admin') {
+          Get.off(() => ClubCategories(loginController: this));
+        } else if (user.userRole == 'user') {
+          Get.off(() => UserDashboardScreen(loginController: this));
+        }
+
+        Get.snackbar('Success', 'Welcome to Sports Center!',
+            backgroundColor: Colors.teal);
+      } on FirebaseAuthException catch (e) {
+        Get.snackbar(
+          'Error',
+          "Login failed. Please check your credentials and try again.",
+          duration: Duration(seconds: 5),
+          backgroundColor: Colors.red[300],
+        );
+
+        debugPrint('Error during login: ${e.message}');
       }
-
-      // Save user information to GetStorage
-      saveUserInfoToStorage(
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        userRole: user.userRole,
-        phoneNumber: user.phoneNumber,
-        imageUrl: user.imageUrl,
-      );
-
-      // Navigate based on user role
-      if (user.userRole == 'admin') {
-        Get.off(() => ClubCategories(loginController: this));
-      } else if (user.userRole == 'user') {
-        Get.off(() => UserDashboardScreen(loginController: this));
-      }
-
-      Get.snackbar('Success', 'Welcome to Sports Center!',
-          backgroundColor: Colors.teal);
     } catch (e) {
-      Get.snackbar("Error!", "Something went wrong: $e",
-          duration: Duration(seconds: 5), backgroundColor: Colors.redAccent);
-      debugPrint('Error during login: $e');
-      throw Exception(e);
+      Get.snackbar(
+        "Error!",
+        "An unexpected error occurred. Please try again later.",
+        duration: Duration(seconds: 5),
+        backgroundColor: Colors.redAccent,
+      );
+      debugPrint('Unexpected error during login: $e');
     } finally {
-      isLoading(false);
+      isLoading(false); // This ensures isLoading is always set to false
     }
   }
 
