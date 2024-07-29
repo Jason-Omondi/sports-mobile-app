@@ -17,6 +17,7 @@ class ClubCategories extends StatelessWidget {
   final LoginController loginController;
   ClubCategories({required this.loginController, Key? key}) : super(key: key);
   final ClubController controller = Get.put(ClubController());
+  final LoginController _loginCont = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +94,7 @@ class ClubCategories extends StatelessWidget {
                   _buildCategoryCard(
                     icon: Icons.kitesurfing,
                     title: 'Events',
-                    onTap: () => Get.to(() =>
-                         const CreateEventsSCreen()
-                        ),
+                    onTap: () => Get.to(() => CreateEventsSCreen()),
                   )
                   // // Add more categories as needed
                 ],

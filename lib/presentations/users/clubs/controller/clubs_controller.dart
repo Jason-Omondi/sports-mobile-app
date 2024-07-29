@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../all_teams_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:mpesadaraja/mpesadaraja.dart';
+import '../../../../data/models/users_model.dart';
 import '../../../../data/config/mpesa_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,6 +18,7 @@ import '../../../login_screen/controller/login_controller.dart';
 
 class ClubController extends GetxController {
   final AdminController adminController = Get.put(AdminController());
+  //final LoginController _loginCont = Get.find();
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode locationFocusNode = FocusNode();
   final FocusNode postalCodeFocusNode = FocusNode();
@@ -88,6 +90,7 @@ class ClubController extends GetxController {
   String? logoUrl;
 
   final MpesaService _mpesaService = MpesaService();
+  final LoginController controller = Get.find();
 
   //final List<ClubTeamsData> teams = <ClubTeamsData>[].obs;
   late DateTime matchDateController = DateTime.now();
@@ -106,6 +109,7 @@ class ClubController extends GetxController {
   RxBool isJuniorTeam = false.obs;
   RxString selectedSport = ''.obs;
   RxString selectedCounty = ''.obs;
+  RxList<Users> userList = RxList<Users>([]);
 
   @override
   void onInit() {
@@ -114,7 +118,8 @@ class ClubController extends GetxController {
     selectedCounty.value = counties.isNotEmpty ? counties.first : '';
     fetchAllClubs();
     fetchAllEquipment();
-    //fetchAllFixtures();
+    fetchAllFixtures();
+    //_loginCont.normalUsersList = userList;
   }
 
   String generateRandomString({int length = 10}) {
@@ -122,6 +127,14 @@ class ClubController extends GetxController {
     final random = Random();
     return List.generate(length, (_) => charset[random.nextInt(charset.length)])
         .join();
+  }
+
+  String getTeamName(String teamId) {
+    ClubTeamsData? team = clubsTeamsData.firstWhere(
+      (team) => team.id == teamId,
+      orElse: () => ClubTeamsData(id: teamId, name: 'Unknown Team'),
+    );
+    return team.name!;
   }
 
   //method should accept image

@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:get/get.dart';
 import '../admin_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/users_model.dart';
+import '../../../data/models/events_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../users/clubs/controller/clubs_controller.dart';
 
 class AdminController extends GetxController {
   final TextEditingController firstNameController = TextEditingController();
@@ -24,6 +27,8 @@ class AdminController extends GetxController {
   final FocusNode lnameFocusNode = FocusNode();
   final FocusNode fnameFocusNode = FocusNode();
   final FocusNode phoneNumberFocusNode = FocusNode();
+  RxList<Announcement> announcements = RxList<Announcement>([]);
+  final ClubController clubController = Get.find<ClubController>();
 
   final _storage = GetStorage();
   RxList<Users> allUserList = RxList<Users>([]);
@@ -38,6 +43,11 @@ class AdminController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAllUsers();
+  }
+
+  String generateUniqueId() {
+    return DateTime.now().millisecondsSinceEpoch.toString() +
+        Random().nextInt(10000).toString();
   }
 
   //fetch all users
@@ -178,6 +188,63 @@ class AdminController extends GetxController {
       throw Exception(e);
     } finally {
       isLoading.value = false; // Set loading state back to false
+    }
+  }
+
+// create an event and store to firestore
+  Future<void> createAnnouncement(Announcement announcement) async {
+    try {
+      isLoading.value = true;
+
+      String uniqueId = generateUniqueId();
+      Announcement announcementWithId = Announcement(
+        id: uniqueId,
+        title: announcement.title,
+        description: announcement.description,
+        type: announcement.type,
+        startDate: announcement.startDate,
+        endDate: announcement.endDate,
+        createdBy: announcement.createdBy,
+        fixtureId: announcement.fixtureId,
+        targetAudience: announcement.targetAudience,
+        offerDetails: announcement.offerDetails,
+        campaignGoals: announcement.campaignGoals,
+        channels: announcement.channels,
+      );
+
+      await FirebaseFirestore.instance
+          .collection('announcements')
+          .doc(uniqueId)
+          .set(announcementWithId.toJson());
+
+      Get.snackbar('Success!', 'Announcement created successfully!',
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.tealAccent);
+      await fetchAnnouncements();
+    } catch (e) {
+      Get.snackbar('Error!', e.toString(),
+          duration: const Duration(seconds: 5));
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+//fetch all events and store in reactive list
+  Future<void> fetchAnnouncements() async {
+    try {
+      isLoading.value = true;
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('announcements').get();
+      List<Announcement> fetchedAnnouncements = querySnapshot.docs
+          .map((doc) =>
+              Announcement.fromJson(doc.data() as Map<String, dynamic>))
+          .toList();
+      announcements.assignAll(fetchedAnnouncements);
+    } catch (e) {
+      debugPrint("Error fetching announcements: $e");
+      throw Exception(e);
+    } finally {
+      isLoading.value = false;
     }
   }
 }

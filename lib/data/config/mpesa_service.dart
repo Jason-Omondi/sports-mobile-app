@@ -8,9 +8,8 @@ class MpesaService {
   final String passkey = dotenv.env['PASSKEY']!;
   final String consumerKey = dotenv.env['CONSUMER_KEY']!;
   final String consumerSecret = dotenv.env['CONSUMER_SECRET']!;
-  final String callbackUrl =
-      "https://8c2a-105-163-0-112.ngrok-free.app"; // Use your server's IP address
-
+  final String callbackUrl = dotenv.env[
+      'CALLBACK_URL']!; // call back response sent from daraja to another server
   Future<String> getAccessToken() async {
     String url =
         "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";

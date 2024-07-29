@@ -114,9 +114,9 @@ class LoginController extends GetxController {
 
         // Navigate based on user role
         if (user.userRole == 'admin') {
-          Get.off(() => ClubCategories(loginController: this));
+          Get.to(() => ClubCategories(loginController: this));
         } else if (user.userRole == 'user') {
-          Get.off(() => UserDashboardScreen(loginController: this));
+          Get.to(() => UserDashboardScreen(loginController: this));
         }
 
         Get.snackbar('Success', 'Welcome to Sports Center!',

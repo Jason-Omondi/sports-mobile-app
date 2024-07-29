@@ -30,6 +30,7 @@ dependencies:
   #mpesa_flutter_plugin:
   flutter_dotenv:
   mpesadaraja:
+  firebase_messaging: ^14.7.10
 
 flutter_icons:
   android: true
