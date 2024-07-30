@@ -8,15 +8,36 @@ import '../../admins/admin_equipment.dart';
 import '../../admins/news_articles_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../utils/widgets/user_drawer.dart';
+import '../../admins/controller/admin_controller.dart';
 import '../../login_screen/controller/login_controller.dart';
 import 'package:sportsapp/presentations/users/clubs/single_team.dart';
 
 //create a new club with members
 
-class ClubCategories extends StatelessWidget {
+class ClubCategories extends StatefulWidget {
   final LoginController loginController;
   ClubCategories({required this.loginController, Key? key}) : super(key: key);
-  final ClubController controller = Get.put(ClubController());
+
+  @override
+  State<ClubCategories> createState() => _ClubCategoriesState();
+}
+
+class _ClubCategoriesState extends State<ClubCategories> {
+  //late final ClubController clubcontroller;
+  //final AdminController admincontroller = Get.put(AdminController());
+  final ClubController clubcontroller = Get.put(ClubController());
+
+  @override
+  void initState() {
+    super.initState();
+    // late ClubController clubController = Get.put(ClubController());
+    // if (Get.isRegistered<ClubController>()) {
+    //   clubController = Get.find<ClubController>();
+    // } else {
+    //   clubController = Get.put(ClubController());
+    // }
+  }
+
   final LoginController _loginCont = Get.find();
 
   @override
@@ -92,10 +113,13 @@ class ClubCategories extends StatelessWidget {
                     onTap: () => Get.to(() => FixturesScreen()),
                   ),
                   _buildCategoryCard(
-                    icon: Icons.kitesurfing,
-                    title: 'Events',
-                    onTap: () => Get.to(() => CreateEventsSCreen()),
-                  )
+                      icon: Icons.kitesurfing,
+                      title: 'Events',
+                      onTap: //() => Get.to(() => CreateEventsSCreen()),
+                          () {
+                        Get.lazyPut<AdminController>(() => AdminController());
+                        Get.to(() => CreateEventsSCreen());
+                      })
                   // // Add more categories as needed
                 ],
               ),
@@ -142,6 +166,7 @@ class ClubCategories extends StatelessWidget {
     );
   }
 }
+
 
 
 

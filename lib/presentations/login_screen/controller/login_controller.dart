@@ -6,6 +6,7 @@ import '../../users/clubs/club_categories.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../users/dashboard/user_homescreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import '../../users/clubs/controller/clubs_controller.dart';
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -20,6 +21,11 @@ class LoginController extends GetxController {
   void onInit() {
     super.onInit();
     //fetchAllUsers();
+    // if (Get.isRegistered<clubController>()) {
+    //   clController = Get.find<ClubController>();
+    // } else {
+    //   clController = Get.put(ClubController());
+    // }
   }
 
   // Fetch all users

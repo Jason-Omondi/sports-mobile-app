@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'controller/admin_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../data/models/equipment_model.dart';
 import '../users/clubs/controller/clubs_controller.dart';
@@ -8,11 +9,35 @@ import '../users/clubs/controller/clubs_controller.dart';
 //import '../users/clubs/controller/clubs_controller.dart';
 //import '../../../data/models/equipment_model.dart'; // Import your ClubController
 
-class EquipmentScreen extends StatelessWidget {
+class EquipmentScreen extends StatefulWidget {
   final String teamId;
-  final ClubController clubController = Get.find();
 
   EquipmentScreen({required this.teamId, Key? key}) : super(key: key);
+
+  @override
+  State<EquipmentScreen> createState() => _EquipmentScreenState();
+}
+
+class _EquipmentScreenState extends State<EquipmentScreen> {
+  late final AdminController _adminController;
+
+  // = Get.put(AdminController());
+  final ClubController clubController = Get.find();
+
+  @override
+  void initState() {
+    Get.lazyPut<AdminController>(() => AdminController());
+    super.initState();
+    print("looking for AdminController");
+    //_adminController = Get.put(AdminController());
+    if (Get.isRegistered<AdminController>()) {
+      _adminController = Get.find<AdminController>();
+      print("Found existing AdminController");
+    } else {
+      print("Not Found existing AdminController");
+      _adminController = Get.put(AdminController());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +81,7 @@ class EquipmentScreen extends StatelessWidget {
                   } else {
                     // Filter equipments by teamId
                     final teamEquipments = clubController.equipments
-                        .where((equipment) => equipment.teamId == teamId)
+                        .where((equipment) => equipment.teamId == widget.teamId)
                         .toList();
 
                     if (teamEquipments.isEmpty) {
@@ -224,7 +249,7 @@ class EquipmentScreen extends StatelessWidget {
                   Equipment(
                     name: selectedName,
                     type: selectedType,
-                    teamId: teamId,
+                    teamId: widget.teamId,
                     issuedDate: DateTime.now(),
                     isReturned: false,
                     condition: selectedCondition,

@@ -17,13 +17,15 @@ import '../../../admins/controller/admin_controller.dart';
 import '../../../login_screen/controller/login_controller.dart';
 
 class ClubController extends GetxController {
-  final AdminController adminController = Get.put(AdminController());
+  //final AdminController adminController = Get.put(AdminController());
   //final LoginController _loginCont = Get.find();
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode locationFocusNode = FocusNode();
   final FocusNode postalCodeFocusNode = FocusNode();
   final FocusNode contactEmailFocusNode = FocusNode();
-  final LoginController loginController = Get.find();
+  //final LoginController loginController = Get.find();
+  //final LoginController loginController = Get.find();
+  //final AdminController adminController = Get.find();
   TextEditingController equipmentNameController = TextEditingController();
   TextEditingController equipmentTypeController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
@@ -90,7 +92,7 @@ class ClubController extends GetxController {
   String? logoUrl;
 
   final MpesaService _mpesaService = MpesaService();
-  final LoginController controller = Get.find();
+  final LoginController lcontroller = Get.find();
 
   //final List<ClubTeamsData> teams = <ClubTeamsData>[].obs;
   late DateTime matchDateController = DateTime.now();
@@ -114,6 +116,16 @@ class ClubController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // if (Get.isRegistered<LoginController>()) {
+    //   loginController = Get.find<LoginController>();
+    // } else {
+    //   loginController = Get.put(LoginController());
+    // }
+    // if (Get.isRegistered<AdminController>()) {
+    //   adminController = Get.find<AdminController>();
+    // } else {
+    //   adminController = Get.put(AdminController());
+    // }
     selectedSport.value = sportsTypes.isNotEmpty ? sportsTypes.first : '';
     selectedCounty.value = counties.isNotEmpty ? counties.first : '';
     fetchAllClubs();
