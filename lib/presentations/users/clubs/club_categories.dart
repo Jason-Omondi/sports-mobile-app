@@ -118,7 +118,7 @@ class _ClubCategoriesState extends State<ClubCategories> {
                       onTap: //() => Get.to(() => CreateEventsSCreen()),
                           () {
                         Get.lazyPut<AdminController>(() => AdminController());
-                        Get.to(() => CreateEventsSCreen());
+                        Get.to(() => CreateEventsScreen());
                       })
                   // // Add more categories as needed
                 ],

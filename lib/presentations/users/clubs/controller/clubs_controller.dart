@@ -256,58 +256,6 @@ class ClubController extends GetxController {
     }
   }
 
-  /*
-  Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
-    try {
-      isLoading(true);
-
-     // initiate stk push here befre storing data to firebase, if stk push returns erro then throw error and stop execution
-// hard code amount to 10
-
-
-      // Simulate creation with delay
-      await Future.delayed(Duration(seconds: 2));
-
-      // Save club data to Firestore with the club ID as document ID
-      await FirebaseFirestore.instance
-          .collection('clubs')
-          .doc(clubData.id)
-          .set({
-        'id': clubData.id,
-        'name': clubData.name,
-        'logoUrl': clubData.logoUrl,
-        'isJuniorTeam': clubData.isJuniorTeam,
-        'sport': clubData.sport,
-        'county': clubData.county,
-        'postalZip': clubData.postalZip,
-        'contactEmail': clubData.contactEmail,
-        //'clubType': clubData.clubType,
-      });
-
-      // Add the newly created club to the reactive list
-      clubsTeamsData.add(clubData);
-
-      // Show success snackbar
-      Get.snackbar('Success', 'Club created successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          duration: Duration(seconds: 5));
-      Get.to(() => TeamsDataScreen());
-    } catch (e) {
-      print('Error creating new club: $e');
-      //Show error snackbar
-      Get.snackbar('Error', 'Something went wrong!',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.redAccent,
-          colorText: Colors.white,
-          duration: Duration(seconds: 5));
-    } finally {
-      isLoading(false);
-    }
-  }
-*/
-
   // Method to fetch all clubs and other information and store in the reactive list
   Future<void> fetchAllClubs() async {
     try {
@@ -685,45 +633,6 @@ class ClubController extends GetxController {
     }
   }
 
-  /* Future<void> createEquipment(Equipment equipment) async {
-    try {
-      isLoading(true);
-      await fetchAllEquipment();
-
-      // Check if the team has already been assigned equipment
-      final existingEquipment =
-          equipments.firstWhereOrNull((e) => e.teamId == equipment.teamId);
-      if (existingEquipment != null) {
-        Get.snackbar('Error', 'This team has already been assigned equipment',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            duration: Duration(seconds: 5));
-        return;
-      }
-
-      final docRef = FirebaseFirestore.instance.collection('equipment').doc();
-      equipment.equipmentID = docRef.id;
-      await docRef.set(equipment.toJson());
-      //equipments.add(equipment);
-      fetchAllEquipment();
-      Get.snackbar('Success', 'Equipment added successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          duration: Duration(seconds: 5));
-    } catch (e) {
-      print('Error adding equipment: $e');
-      Get.snackbar('Error', 'Failed to add equipment',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          duration: Duration(seconds: 5));
-    } finally {
-      isLoading(false);
-    }
-  } */
-
   Future<void> createEquipment(Equipment equipment) async {
     try {
       isLoading(true);
@@ -891,8 +800,63 @@ class ClubController extends GetxController {
       isLoading(false);
     }
   }
+}
+
 
   /*
+  Future<void> createNewClub(ClubTeamsData clubData, String phoneNumber) async {
+    try {
+      isLoading(true);
+
+     // initiate stk push here befre storing data to firebase, if stk push returns erro then throw error and stop execution
+// hard code amount to 10
+
+
+      // Simulate creation with delay
+      await Future.delayed(Duration(seconds: 2));
+
+      // Save club data to Firestore with the club ID as document ID
+      await FirebaseFirestore.instance
+          .collection('clubs')
+          .doc(clubData.id)
+          .set({
+        'id': clubData.id,
+        'name': clubData.name,
+        'logoUrl': clubData.logoUrl,
+        'isJuniorTeam': clubData.isJuniorTeam,
+        'sport': clubData.sport,
+        'county': clubData.county,
+        'postalZip': clubData.postalZip,
+        'contactEmail': clubData.contactEmail,
+        //'clubType': clubData.clubType,
+      });
+
+      // Add the newly created club to the reactive list
+      clubsTeamsData.add(clubData);
+
+      // Show success snackbar
+      Get.snackbar('Success', 'Club created successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+      Get.to(() => TeamsDataScreen());
+    } catch (e) {
+      print('Error creating new club: $e');
+      //Show error snackbar
+      Get.snackbar('Error', 'Something went wrong!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  }
+*/
+
+
+/*
   Future<void> deleteEquipment(Equipment equipment) async {
     try {
       isLoading(true);
@@ -917,7 +881,44 @@ class ClubController extends GetxController {
       isLoading(false);
     }
   } */
-}
+  /* Future<void> createEquipment(Equipment equipment) async {
+    try {
+      isLoading(true);
+      await fetchAllEquipment();
+
+      // Check if the team has already been assigned equipment
+      final existingEquipment =
+          equipments.firstWhereOrNull((e) => e.teamId == equipment.teamId);
+      if (existingEquipment != null) {
+        Get.snackbar('Error', 'This team has already been assigned equipment',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 5));
+        return;
+      }
+
+      final docRef = FirebaseFirestore.instance.collection('equipment').doc();
+      equipment.equipmentID = docRef.id;
+      await docRef.set(equipment.toJson());
+      //equipments.add(equipment);
+      fetchAllEquipment();
+      Get.snackbar('Success', 'Equipment added successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } catch (e) {
+      print('Error adding equipment: $e');
+      Get.snackbar('Error', 'Failed to add equipment',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 5));
+    } finally {
+      isLoading(false);
+    }
+  } */
 
 
   /*

@@ -7,17 +7,13 @@ import 'presentations/intro_screen/splash_screen.dart';
 import 'package:sportsapp/data/config/firebase_api.dart';
 import 'presentations/users/clubs/controller/clubs_controller.dart';
 
-//import 'package:sportsapp/presentations/users/clubs/controller/clubs_controller.dart';
-// import 'package:mpesa_flutter_plugin/mpesa_flutter_plugin.dart';
-// ignore: import_of_legacy_library_into_null_safe
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await dotenv.load(fileName: ".env");
-  //await FirebaseAPI().initializeNotification();
+  await FirebaseAPI().initializeNotification();
 
   // MpesaFlutterPlugin.setConsumerKey(dotenv.env['consumer_key']!);
   // MpesaFlutterPlugin.setConsumerSecret(dotenv.env['consumer_secret']!);
@@ -33,8 +29,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
-  //final ClubController controller = Get.put(ClubController());
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

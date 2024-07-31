@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 import '../admin_profile_screen.dart';
 import 'package:flutter/material.dart';
+import '../admin_announcments_list.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../data/models/users_model.dart';
 import '../../../data/models/events_model.dart';
@@ -43,6 +44,7 @@ class AdminController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAllUsers();
+    fetchAnnouncements();
   }
 
   String generateUniqueId() {
@@ -221,6 +223,7 @@ class AdminController extends GetxController {
           duration: const Duration(seconds: 5),
           backgroundColor: Colors.tealAccent);
       await fetchAnnouncements();
+      Get.to(AnnouncementsScreen());
     } catch (e) {
       Get.snackbar('Error!', e.toString(),
           duration: const Duration(seconds: 5));
@@ -233,6 +236,7 @@ class AdminController extends GetxController {
   Future<void> fetchAnnouncements() async {
     try {
       isLoading.value = true;
+      announcements.clear();
       QuerySnapshot querySnapshot =
           await FirebaseFirestore.instance.collection('announcements').get();
       List<Announcement> fetchedAnnouncements = querySnapshot.docs
@@ -240,11 +244,32 @@ class AdminController extends GetxController {
               Announcement.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       announcements.assignAll(fetchedAnnouncements);
+
+      debugPrint("Announcements: ${announcements.length}");
     } catch (e) {
       debugPrint("Error fetching announcements: $e");
       throw Exception(e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  //delete
+  Future<void> deleteAnnouncement(String announcementId) async {
+    try {
+      isLoading(true);
+      await FirebaseFirestore.instance
+          .collection('announcements')
+          .doc(announcementId)
+          .delete();
+      announcements
+          .removeWhere((announcement) => announcement.id == announcementId);
+      await fetchAnnouncements();
+      Get.snackbar('Success', 'Event deleted successfully');
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to delete announcement: $e');
+    } finally {
+      isLoading(false);
     }
   }
 }

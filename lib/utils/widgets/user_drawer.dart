@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../presentations/admins/admin_profile_screen.dart';
 import '../../presentations/admins/news_articles_screen.dart';
-import '../../presentations/users/clubs/club_categories.dart';
 import 'package:sportsapp/presentations/intro_screen/splash_screen.dart';
 import '../../presentations/login_screen/controller/login_controller.dart';
+import 'package:sportsapp/presentations/admins/controller/admin_controller.dart';
 
 class CustomDrawer extends StatelessWidget {
   //final String imageUrl;
@@ -75,21 +75,23 @@ class CustomDrawer extends StatelessWidget {
           //if user role form get storage == admin show below widget
           ListTile(
             title: Text(
-              'News',
+              'Event Management',
               style: GoogleFonts.nunito(),
             ),
             onTap: () {
-              Get.to(() => CreateEventsSCreen());
+              Get.lazyPut<AdminController>(() => AdminController());
+              Get.to(() => CreateEventsScreen());
             },
           ),
           if (GetStorage().read('user_role') == 'admin')
             ListTile(
               title: Text(
-                'Profile',
+                'User Profile',
                 style: GoogleFonts.nunito(),
               ),
               onTap: () {
                 // Navigate to manage screen after cheking userRole == admin from get storage
+                Get.lazyPut<AdminController>(() => AdminController());
                 Get.to(() => ManageAdmins());
 
                 // get to user profile if userRoler == user
